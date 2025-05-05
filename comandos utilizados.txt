@@ -1,0 +1,4 @@
+comandos utilizados: 
+cd djangoproy
+cd basepoke
+python manage.py runserver

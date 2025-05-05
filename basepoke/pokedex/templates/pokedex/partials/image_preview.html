@@ -1,0 +1,5 @@
+{% if image_url %}
+    <img src="{{ image_url }}" alt="Preview" class="h-32 w-32 object-contain border border-gray-300 rounded-lg">
+{% else %}
+    <div class="text-red-500 text-center p-2">Invalid image URL</div>
+{% endif %}

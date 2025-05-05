@@ -1,0 +1,69 @@
+{% extends 'pokedex/base.html' %}
+{% load static %}
+
+{% block title %}{{ tipo.Nombre_Tipo }} - Detalles{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md overflow-hidden" {% if tipo.Color %}style="border-left: 5px solid {{ tipo.Color }};"{% endif %}>
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800">{{ tipo.Nombre_Tipo }}</h1>
+                <div class="flex space-x-2">
+                    <a href="{% url 'tipo_update' tipo.id %}" class="bg-pokemon-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Editar
+                    </a>
+                    <a href="{% url 'tipo_delete' tipo.id %}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Eliminar
+                    </a>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">Detalles del tipo</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-500 text-sm">Nombre</p>
+                        <p class="text-gray-800 font-medium">{{ tipo.Nombre_Tipo }}</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="text-gray-500 text-sm">Color</p>
+                        <div class="flex items-center">
+                            {% if tipo.Color %}
+                            <div class="w-6 h-6 rounded-full mr-2" style="background-color: {{ tipo.Color }};"></div>
+                            <p class="text-gray-800 font-medium">{{ tipo.Color }}</p>
+                            {% else %}
+                            <p class="text-gray-500 italic">No especificado</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">Pokémon de este tipo</h2>
+                {% if pokemons %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                    {% for pokemon_tipo in pokemons %}
+                    <div class="flex items-center bg-gray-100 p-3 rounded-lg hover:bg-gray-200">
+                        <span class="text-gray-600 font-medium">#{{ pokemon_tipo.pokemon.No_Pokemon }}</span>
+                        <a href="{% url 'pokemon_detail' pokemon_tipo.pokemon.No_Pokemon %}" class="ml-3 text-pokemon-blue hover:text-blue-700">
+                            {{ pokemon_tipo.pokemon.Nombre }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 italic">Ningún Pokémon tiene este tipo actualmente.</p>
+                {% endif %}
+            </div>
+
+            <div class="mt-8 border-t pt-6">
+                <a href="{% url 'tipo_list' %}" class="text-pokemon-blue hover:text-blue-700">
+                    &larr; Volver a la lista de tipos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pokédex Nacional{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pokemon-red': '#FF0000',
+                        'pokemon-dark-red': '#CC0000',
+                        'pokemon-blue': '#0075BE',
+                        'pokemon-yellow': '#FFCC00',
+                        'pokemon-green': '#4CAF50',
+                        'type-normal': '#A8A878',
+                        'type-fire': '#F08030',
+                        'type-water': '#6890F0',
+                        'type-electric': '#F8D030',
+                        'type-grass': '#78C850',
+                        'type-ice': '#98D8D8',
+                        'type-fighting': '#C03028',
+                        'type-poison': '#A040A0',
+                        'type-ground': '#E0C068',
+                        'type-flying': '#A890F0',
+                        'type-psychic': '#F85888',
+                        'type-bug': '#A8B820',
+                        'type-rock': '#B8A038',
+                        'type-ghost': '#705898',
+                        'type-dragon': '#7038F8',
+                        'type-dark': '#705848',
+                        'type-steel': '#B8B8D0',
+                        'type-fairy': '#EE99AC'
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s linear infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- HTMX for interactive elements -->
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <!-- Alpine.js for UI interactions -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cc0000;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff0000;
+        }
+        
+        /* Type badges */
+        .type-badge {
+            @apply inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium text-white shadow-sm;
+        }
+        
+        /* Pokeball loader */
+        .pokeball-loader {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(to bottom, #ff0000 0%, #ff0000 50%, #fff 50%, #fff 100%);
+            border-radius: 50%;
+            border: 3px solid black;
+            position: relative;
+            animation: spin 1.5s linear infinite;
+            display: inline-block;
+        }
+        .pokeball-loader::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-radius: 50%;
+            border: 3px solid black;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Pokédex styling */
+        .pokedex-button {
+            @apply h-14 w-14 rounded-full shadow-md flex items-center justify-center transition-all duration-200 hover:scale-110;
+        }
+        
+        /* Button styling */
+        .btn-primary {
+            @apply inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pokemon-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pokemon-red transition-colors;
+        }
+        
+        .btn-secondary {
+            @apply inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pokemon-blue transition-colors;
+        }
+        
+        .btn-danger {
+            @apply inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors;
+        }
+        
+        /* Card styling */
+        .pokemon-card {
+            @apply bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300;
+        }
+        
+        /* Pokemon type colors for backgrounds */
+        .bg-type-normal { @apply bg-type-normal text-gray-800; }
+        .bg-type-fire { @apply bg-type-fire text-white; }
+        .bg-type-water { @apply bg-type-water text-white; }
+        .bg-type-electric { @apply bg-type-electric text-gray-800; }
+        .bg-type-grass { @apply bg-type-grass text-white; }
+        .bg-type-ice { @apply bg-type-ice text-gray-800; }
+        .bg-type-fighting { @apply bg-type-fighting text-white; }
+        .bg-type-poison { @apply bg-type-poison text-white; }
+        .bg-type-ground { @apply bg-type-ground text-gray-800; }
+        .bg-type-flying { @apply bg-type-flying text-white; }
+        .bg-type-psychic { @apply bg-type-psychic text-white; }
+        .bg-type-bug { @apply bg-type-bug text-white; }
+        .bg-type-rock { @apply bg-type-rock text-white; }
+        .bg-type-ghost { @apply bg-type-ghost text-white; }
+        .bg-type-dragon { @apply bg-type-dragon text-white; }
+        .bg-type-dark { @apply bg-type-dark text-white; }
+        .bg-type-steel { @apply bg-type-steel text-gray-800; }
+        .bg-type-fairy { @apply bg-type-fairy text-gray-800; }
+        
+        /* Stat bars */
+        .stat-bar {
+            @apply h-2 rounded-full bg-gray-200 overflow-hidden;
+        }
+        
+        .stat-bar-hp .stat-value { @apply bg-green-500; }
+        .stat-bar-attack .stat-value { @apply bg-red-500; }
+        .stat-bar-defense .stat-value { @apply bg-blue-500; }
+        .stat-bar-special-attack .stat-value { @apply bg-purple-500; }
+        .stat-bar-special-defense .stat-value { @apply bg-teal-500; }
+        .stat-bar-speed .stat-value { @apply bg-yellow-500; }
+        
+        .stat-value {
+            @apply h-full rounded-full;
+        }
+        
+        /* Pulsating animation for Pokédex lights */
+        @keyframes pulsate {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        .pulsate {
+            animation: pulsate 2s infinite;
+        }
+        
+        /* For tables with alternating row colors */
+        .table-row-alternating tr:nth-child(even) {
+            @apply bg-gray-50;
+        }
+        
+        /* Hide Alpine.js elements before Alpine is loaded */
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-pokemon-red to-pokemon-dark-red text-white shadow-xl">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'index' %}" class="flex items-center">
+                        <!--<div class="w-10 h-10 bg-white rounded-full mr-2 flex items-center justify-center">
+                            <div class="w-8 h-8 bg-gradient-to-b from-red-500 to-white rounded-full border border-gray-800 relative">
+                                <div class="absolute w-2 h-2 bg-white rounded-full border border-gray-800 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+                            </div>
+                        </div>-->
+                        <img src="{% static 'pokedex/images/pokedex.png' %}" alt="Pokéball Logo" class="w-10 h-10 mr-2">
+                        <span class="text-2xl font-bold bg-white text-pokemon-red px-3 py-1 rounded-lg transform hover:scale-105 transition-transform duration-200">Pokédex</span>
+                    </a>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="{% url 'pokemon_list' %}" class="group flex items-center hover:bg-red-700 px-3 py-1 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <span>Pokémon</span>
+                        </a>
+                        <a href="{% url 'movimiento_list' %}" class="group flex items-center hover:bg-red-700 px-3 py-1 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span>Movimientos</span>
+                        </a>
+                        <a href="{% url 'habilidad_list' %}" class="group flex items-center hover:bg-red-700 px-3 py-1 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            <span>Habilidades</span>
+                        </a>
+                        <a href="{% url 'tipo_list' %}" class="group flex items-center hover:bg-red-700 px-3 py-1 rounded-md transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                            </svg>
+                            <span>Tipos</span>
+                        </a>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center hover:bg-red-700 px-3 py-1 rounded-md transition-colors">
+                                <span>Más</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" :class="{'transform rotate-180': open}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div x-show="open" 
+                                 @click.away="open = false" 
+                                 x-transition:enter="transition ease-out duration-100" 
+                                 x-transition:enter-start="transform opacity-0 scale-95" 
+                                 x-transition:enter-end="transform opacity-100 scale-100" 
+                                 x-transition:leave="transition ease-in duration-75" 
+                                 x-transition:leave-start="transform opacity-100 scale-100" 
+                                 x-transition:leave-end="transform opacity-0 scale-95" 
+                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                                <div class="py-1">
+                                    <a href="{% url 'categoria_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Categorías</a>
+                                    <a href="{% url 'generacion_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Generaciones</a>
+                                    <a href="{% url 'grupo_huevo_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Grupos Huevo</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" class="text-white focus:outline-none" 
+                            x-data="{}" 
+                            @click="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div class="hidden md:hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="{% url 'pokemon_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        Pokémon
+                    </a>
+                    <a href="{% url 'movimiento_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Movimientos
+                    </a>
+                    <a href="{% url 'habilidad_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Habilidades
+                    </a>
+                    <a href="{% url 'tipo_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                        </svg>
+                        Tipos
+                    </a>
+                    <a href="{% url 'categoria_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">Categorías</a>
+                    <a href="{% url 'generacion_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">Generaciones</a>
+                    <a href="{% url 'grupo_huevo_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">Grupos Huevo</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% if messages %}
+    <div class="container mx-auto px-4 py-2">
+        {% for message in messages %}
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+             class="flex items-center p-4 mb-2 rounded-lg shadow-md {{ message.tags }}-message
+                    {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200
+                    {% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200
+                    {% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200
+                    {% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}">
+            <div class="mr-2">
+                {% if message.tags == 'success' %}
+                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                {% elif message.tags == 'error' %}
+                <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                {% elif message.tags == 'warning' %}
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                {% else %}
+                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                {% endif %}
+            </div>
+            <div class="text-sm font-medium">{{ message }}</div>
+            <button @click="show = false" class="ml-auto text-gray-500 hover:text-gray-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-6 mt-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 flex items-center">
+                    <div class="w-8 h-8 bg-gradient-to-b from-red-500 to-white rounded-full border border-gray-800 relative mr-3">
+                        <div class="absolute w-2 h-2 bg-white rounded-full border border-gray-800 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">Pokédex Nacional</h3>
+                        <p class="text-sm text-gray-400">Sistema de gestión de datos Pokémon</p>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-400">
+                    <p class="text-sm text-gray-400">Enrique De Jesus Figueroa Diaz</p><br>
+                    &copy; 2025 Pokédex Nacional. Todos los derechos reservados.
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Loading indicator -->
+    <div id="htmx-indicator" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="pokeball-loader"></div>
+    </div>
+    
+    <!-- Modal container for HTMX -->
+    <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50" x-data>
+        <div id="modal-content" class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto"
+             @click.outside="document.getElementById('modal-container').classList.add('hidden')">
+            <!-- Modal content will be loaded here via HTMX -->
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // HTMX loading indicator
+        document.body.addEventListener('htmx:beforeRequest', function(event) {
+            document.getElementById('htmx-indicator').classList.remove('hidden');
+            document.getElementById('htmx-indicator').classList.add('flex');
+        });
+        
+        document.body.addEventListener('htmx:afterRequest', function(event) {
+            document.getElementById('htmx-indicator').classList.add('hidden');
+            document.getElementById('htmx-indicator').classList.remove('flex');
+        });
+        
+        // Handle HTMX modal display
+        document.addEventListener('htmx:afterSwap', function(event) {
+            if (event.detail.target.id === 'modal-content') {
+                document.getElementById('modal-container').classList.remove('hidden');
+                document.getElementById('modal-container').classList.add('flex');
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

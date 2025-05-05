@@ -1,0 +1,46 @@
+{% extends 'pokedex/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Tipos{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Tipos Pokémon</h1>
+        <a href="{% url 'tipo_create' %}" class="bg-pokemon-red hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+            Agregar Tipo
+        </a>
+    </div>
+
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for tipo in tipos %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300" {% if tipo.Color %}style="border-left: 5px solid {{ tipo.Color }};"{% endif %}>
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ tipo.Nombre_Tipo }}</h2>
+                <div class="flex justify-between items-center mt-4">
+                    <span class="text-sm text-gray-500">ID: {{ tipo.id }}</span>
+                    <a href="{% url 'tipo_detail' tipo.id %}" class="text-pokemon-blue hover:text-blue-700">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-3 text-center py-8">
+            <p class="text-gray-500 text-lg">No hay tipos registrados.</p>
+            <a href="{% url 'tipo_create' %}" class="inline-block mt-4 bg-pokemon-red hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                Agregar el primer tipo
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

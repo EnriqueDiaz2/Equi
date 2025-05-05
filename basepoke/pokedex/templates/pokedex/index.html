@@ -1,0 +1,470 @@
+{% extends "pokedex/base.html" %}
+{% load static %}
+
+{% block title %}Pokédex - Inicio{% endblock %}
+
+{% block head_extra %}
+<style>
+    .stat-card {
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .pokedex-screen {
+        background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+    }
+    
+    .pokedex-screen:before {
+        content: '';
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        width: 1rem;
+        height: 1rem;
+        background-color: #ff0000;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        animation: blink 2s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .pokedex-controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .pokedex-button {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+    }
+    
+    .pokedex-button-red { background-color: #ff0000; }
+    .pokedex-button-yellow { background-color: #ffcc00; }
+    .pokedex-button-green { background-color: #00cc00; }
+    
+    .card-pokemon { background-color: #ef4444; }
+    .card-movimiento { background-color: #3b82f6; }
+    .card-habilidad { background-color: #10b981; }
+    .card-tipo { background-color: #f59e0b; }
+    .card-categoria { background-color: #8b5cf6; }
+    .card-generacion { background-color: #ec4899; }
+    .card-huevo { background-color: #6366f1; }
+    
+    .card-pokemon .icon { color: #fee2e2; }
+    .card-movimiento .icon { color: #dbeafe; }
+    .card-habilidad .icon { color: #d1fae5; }
+    .card-tipo .icon { color: #fef3c7; }
+    .card-categoria .icon { color: #ede9fe; }
+    .card-generacion .icon { color: #fce7f3; }
+    .card-huevo .icon { color: #e0e7ff; }
+    
+    .pokemon-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .pokemon-thumb {
+        position: relative;
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .pokemon-thumb:hover {
+        transform: scale(1.05);
+        z-index: 10;
+    }
+    
+    .pokemon-number {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #374151;
+    }
+    
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-up {
+        animation: fadeUp 0.5s ease-out forwards;
+    }
+    
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-600 { animation-delay: 0.6s; }
+    .delay-700 { animation-delay: 0.7s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen" x-data="{ showTutorial: !localStorage.getItem('seenTutorial') }">
+    <!-- Welcome Banner -->
+    <div class="bg-pokemon-red py-16 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-pattern opacity-10"></div>
+        <div class="container mx-auto relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="text-white">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4 fade-up">Bienvenido a la Pokédex</h1>
+                    <p class="text-xl mb-6 opacity-90 fade-up delay-100">Tu base de datos completa del mundo Pokémon</p>
+                    <p class="mb-8 opacity-80 fade-up delay-200">Registra, consulta y gestiona todos los datos de tus Pokémon favoritos en un solo lugar.</p>
+                    <div class="flex flex-wrap gap-4 fade-up delay-300">
+                        <a href="{% url 'pokemon_list' %}" 
+                           class="inline-flex items-center px-6 py-3 bg-white text-pokemon-red font-semibold rounded-full shadow-md hover:bg-gray-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            </svg>
+                            Ver Todos los Pokémon
+                        </a>
+                        <a href="{% url 'pokemon_create' %}" 
+                           class="inline-flex items-center px-6 py-3 border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-pokemon-red transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Registrar Nuevo Pokémon
+                        </a>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <img src="{% static 'pokedex/images/footer_logo-removebg-preview.png' %}" 
+                         onerror="this.src='{% static 'pokedex/footer_logo-removebg-preview.png' %}'; 
+                                 if (!this.complete) this.src='{% static 'footer_logo-removebg-preview.png' %}'; 
+                                 if (!this.complete) this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/items/poke-ball.png';" 
+                         class="w-auto h-48 md:h-64 object-contain relative fade-up delay-400" 
+                         alt="Pokémon Logo">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if not error_message %}
+    <!-- Dashboard Stats -->
+    <div class="container mx-auto px-4 py-12">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 fade-up">Estadísticas de la Pokédex</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+            <!-- Pokemon Count -->
+            <a href="{% url 'pokemon_list' %}" class="stat-card card-pokemon fade-up">
+                <div class="bg-white p-6 border-t-4 border-pokemon-red h-full">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700">Pokémon</h3>
+                        <div class="p-2 bg-red-100 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945A2.955 2.955 0 0110.045 22H9.5a2 2 0 01-2-2v-1.5a2 2 0 00-2-2H3.055A2.955 2.955 0 010 16.955V15a2 2 0 012-2h1.5a2 2 0 002-2V9.5a2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-gray-900">{{ pokemon_count }}</div>
+                        <span class="text-xs text-gray-500">Registrados</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Movimiento Count -->
+            <a href="{% url 'movimiento_list' %}" class="stat-card card-movimiento fade-up delay-100">
+                <div class="bg-white p-6 border-t-4 border-blue-500 h-full">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700">Movimientos</h3>
+                        <div class="p-2 bg-blue-100 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-gray-900">{{ movimiento_count }}</div>
+                        <span class="text-xs text-gray-500">Registrados</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Habilidad Count -->
+            <a href="{% url 'habilidad_list' %}" class="stat-card card-habilidad fade-up delay-200">
+                <div class="bg-white p-6 border-t-4 border-green-500 h-full">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700">Habilidades</h3>
+                        <div class="p-2 bg-green-100 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-gray-900">{{ habilidad_count }}</div>
+                        <span class="text-xs text-gray-500">Registradas</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Tipo Count -->
+            <a href="{% url 'tipo_list' %}" class="stat-card card-tipo fade-up delay-300">
+                <div class="bg-white p-6 border-t-4 border-yellow-500 h-full">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700">Tipos</h3>
+                        <div class="p-2 bg-yellow-100 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-gray-900">{{ tipo_count }}</div>
+                        <span class="text-xs text-gray-500">Registrados</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Categories, Generations, Egg Groups -->
+            <a href="{% url 'categoria_list' %}" class="stat-card card-categoria fade-up delay-400">
+                <div class="bg-white p-6 border-t-4 border-purple-500 h-full">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700">Categorías</h3>
+                        <div class="p-2 bg-purple-100 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2h1.5a2 2 0 002-2V9.5a2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-gray-900">{{ categoria_count }}</div>
+                        <span class="text-xs text-gray-500">Registradas</span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'generacion_list' %}" class="stat-card card-generacion fade-up delay-500">
+                <div class="bg-white p-6 border-t-4 border-pink-500 h-full">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700">Generaciones</h3>
+                        <div class="p-2 bg-pink-100 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-gray-900">{{ generacion_count }}</div>
+                        <span class="text-xs text-gray-500">Registradas</span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'grupo_huevo_list' %}" class="stat-card card-huevo fade-up delay-600">
+                <div class="bg-white p-6 border-t-4 border-indigo-500 h-full">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-gray-700">Grupos Huevo</h3>
+                        <div class="p-2 bg-indigo-100 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M9 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div class="text-3xl font-bold text-gray-900">{{ grupo_huevo_count }}</div>
+                        <span class="text-xs text-gray-500">Registrados</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Quick Actions -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 mt-12 fade-up">Acciones Rápidas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <a href="{% url 'pokemon_create' %}" class="bg-gradient-to-r from-pokemon-red to-red-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all fade-up">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-white opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-xl font-bold mb-2">Registrar Pokémon</h3>
+                <p class="text-white text-opacity-90">Añade un nuevo Pokémon a la Pokédex</p>
+            </a>
+            
+            <a href="{% url 'tipo_create' %}" class="bg-gradient-to-r from-yellow-500 to-yellow-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all fade-up delay-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-white opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+                <h3 class="text-xl font-bold mb-2">Añadir Tipo</h3>
+                <p class="text-white text-opacity-90">Crear un nuevo tipo de Pokémon</p>
+            </a>
+            
+            <a href="{% url 'movimiento_create' %}" class="bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all fade-up delay-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-white opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <h3 class="text-xl font-bold mb-2">Crear Movimiento</h3>
+                <p class="text-white text-opacity-90">Registrar un nuevo movimiento</p>
+            </a>
+            
+            <a href="{% url 'habilidad_create' %}" class="bg-gradient-to-r from-green-500 to-green-700 rounded-xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all fade-up delay-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-white opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-xl font-bold mb-2">Nueva Habilidad</h3>
+                <p class="text-white text-opacity-90">Añadir una habilidad de Pokémon</p>
+            </a>
+        </div>
+        
+        <!-- Pokédex Interactive Display -->
+        <div class="pokedex-screen mt-16 mb-12 fade-up delay-400">
+            <div class="pokedex-controls">
+                <div class="pokedex-button pokedex-button-red"></div>
+                <div class="pokedex-button pokedex-button-yellow"></div>
+                <div class="pokedex-button pokedex-button-green"></div>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Últimos Pokémon Registrados</h2>
+            
+            <div class="pokemon-grid" x-data="{ pokemons: [] }" x-init="fetch('{% url 'pokemon_list' %}?format=json').then(response => response.json()).then(data => pokemons = data.slice(0, 8))">
+                <template x-for="pokemon in pokemons" :key="pokemon.No_Pokemon">
+                    <a :href="`/pokemon/${pokemon.No_Pokemon}/`" class="pokemon-thumb bg-white shadow-md">
+                        <div class="pokemon-number" x-text="`#${pokemon.No_Pokemon}`"></div>
+                        <img x-bind:src="pokemon.Ruta_Imagen || 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'" 
+                             x-bind:alt="pokemon.Nombre" 
+                             class="w-full h-32 object-contain p-2">
+                        <div class="p-3 bg-gray-50">
+                            <h3 class="text-sm font-semibold text-center" x-text="pokemon.Nombre"></h3>
+                        </div>
+                    </a>
+                </template>
+                
+                <template x-if="pokemons.length === 0">
+                    <div class="col-span-full text-center py-8">
+                        <p class="text-gray-500">No hay Pokémon registrados aún.</p>
+                        <a href="{% url 'pokemon_create' %}" class="inline-block mt-4 px-4 py-2 bg-pokemon-red text-white rounded-full hover:bg-red-700 transition-colors">
+                            Registrar el primer Pokémon
+                        </a>
+                    </div>
+                </template>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <a href="{% url 'pokemon_list' %}" class="inline-flex items-center px-4 py-2 bg-pokemon-blue text-white rounded-full hover:bg-blue-700 transition-colors">
+                    <span>Ver todos los Pokémon</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+        
+        <div class="mt-16 text-center">
+            <a href="{% url 'pokemon_create' %}" class="inline-flex items-center px-6 py-3 text-lg font-medium rounded-full text-white bg-gradient-to-r from-pokemon-red to-pokemon-dark-red hover:from-pokemon-dark-red hover:to-red-800 shadow-lg transition-all duration-300 transform hover:scale-105 fade-up delay-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Registrar Nuevo Pokémon
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <!-- Error message display -->
+    <div class="container mx-auto px-4 py-12">
+        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+            <div class="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Error de Conexión</h2>
+                <p class="text-gray-600 mb-6">{{ error_message }}</p>
+                <div class="bg-gray-100 p-4 rounded-lg mb-6">
+                    <p class="text-gray-700 font-mono text-sm">{{ setup_required|yesno:"La configuración inicial es necesaria.,," }}</p>
+                </div>
+                <a href="/" class="px-4 py-2 bg-pokemon-red text-white rounded-full hover:bg-red-700 transition-colors">
+                    Reintentar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- New User Tutorial -->
+    <div x-show="showTutorial" x-cloak class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+        x-transition:enter="transition ease-out duration-300" 
+        x-transition:enter-start="opacity-0" 
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-lg max-w-lg w-full mx-4"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="transform scale-95"
+            x-transition:enter-end="transform scale-100">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">¡Bienvenido a tu Pokédex!</h3>
+                    <button @click="showTutorial = false" class="text-gray-400 hover:text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-gray-600">¡Esta es tu nueva base de datos de Pokémon! Aquí puedes:</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Registrar nuevos Pokémon y sus características</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Agregar movimientos, habilidades, tipos y más</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Buscar y filtrar tu colección completa</span>
+                        </li>
+                    </ul>
+                    <p class="text-gray-600">¿Listo para empezar? ¡Registra tu primer Pokémon!</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-between">
+                <button @click="showTutorial = false; localStorage.setItem('seenTutorial', 'true')" class="text-gray-500 hover:text-gray-700">
+                    No mostrar de nuevo
+                </button>
+                <a href="{% url 'pokemon_create' %}" class="px-4 py-2 bg-pokemon-red text-white rounded-full hover:bg-red-700 transition-colors">
+                    ¡Empezar ahora!
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

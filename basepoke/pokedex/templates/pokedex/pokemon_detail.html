@@ -1,0 +1,738 @@
+{% extends "pokedex/base.html" %}
+{% load static %}
+
+{% block title %}Pokédex - {{ pokemon.Nombre }}{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* Type badge styling */
+    .type-badge {
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    
+    /* Pokémon Type Colors */
+    .bg-type-normal { background-color: #A8A878; color: white; }
+    .bg-type-fire { background-color: #F08030; color: white; }
+    .bg-type-water { background-color: #6890F0; color: white; }
+    .bg-type-electric { background-color: #F8D030; color: white; }
+    .bg-type-grass { background-color: #78C850; color: white; }
+    .bg-type-ice { background-color: #98D8D8; color: white; }
+    .bg-type-fighting { background-color: #C03028; color: white; }
+    .bg-type-poison { background-color: #A040A0; color: white; }
+    .bg-type-ground { background-color: #E0C068; color: white; }
+    .bg-type-flying { background-color: #A890F0; color: white; }
+    .bg-type-psychic { background-color: #F85888; color: white; }
+    .bg-type-bug { background-color: #A8B820; color: white; }
+    .bg-type-rock { background-color: #B8A038; color: white; }
+    .bg-type-ghost { background-color: #705898; color: white; }
+    .bg-type-dragon { background-color: #7038F8; color: white; }
+    .bg-type-dark { background-color: #705848; color: white; }
+    .bg-type-steel { background-color: #B8B8D0; color: white; }
+    .bg-type-fairy { background-color: #EE99AC; color: white; }
+    
+    /* Stat bar styling */
+    .stat-bar {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #f3f4f6;
+        overflow: hidden;
+    }
+    
+    .stat-bar div {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+        transition: width 1.5s ease-in-out;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    
+    @keyframes slideInRight {
+        0% { transform: translateX(100px); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes pulseEffect {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .animate-slide-in-right {
+        animation: slideInRight 0.5s ease-out;
+    }
+    
+    .animate-pulse {
+        animation: pulseEffect 2s infinite;
+    }
+    
+    .btn-primary {
+        background-color: #ef4444;
+        color: white;
+        border-radius: 9999px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #dc2626;
+        transform: translateY(-2px);
+    }
+    
+    /* Pokédex design elements */
+    .pokedex-dots {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .pokedex-dots .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .pokedex-dots .dot-red { background-color: #ef4444; }
+    .pokedex-dots .dot-yellow { background-color: #f59e0b; }
+    .pokedex-dots .dot-green { background-color: #10b981; }
+    
+    /* Floating action button */
+    .fab {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 50;
+    }
+    
+    .fab-buttons {
+        position: absolute;
+        bottom: 70px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        transform: translateY(20px);
+    }
+    
+    .fab-buttons.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+    
+    .fab-button {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+    }
+    
+    .fab-button:hover {
+        transform: scale(1.1);
+    }
+    
+    .fab-label {
+        position: absolute;
+        right: 64px;
+        background-color: #1f2937;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        opacity: 0;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .fab-button:hover .fab-label {
+        opacity: 1;
+        transform: translateX(0);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen pb-20"
+     x-data="{ 
+        activeTab: 'info',
+        fabActive: false,
+        scrolled: false,
+        
+        toggleFab() {
+            this.fabActive = !this.fabActive;
+        },
+        
+        checkScroll() {
+            this.scrolled = window.scrollY > 100;
+        }
+    }"
+    x-init="window.addEventListener('scroll', checkScroll)"
+    @keydown.escape="fabActive = false">
+    
+    <!-- Header with action buttons -->
+    <div class="bg-pokemon-red py-6 px-4 shadow-md sticky top-0 z-40" 
+        :class="{'bg-opacity-95 shadow-lg': scrolled}"
+        x-transition>
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <a href="{% url 'pokemon_list' %}" class="text-white hover:text-gray-200 mr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </a>
+                <div class="pokedex-dots mr-4">
+                    <div class="dot dot-red"></div>
+                    <div class="dot dot-yellow"></div>
+                    <div class="dot dot-green"></div>
+                </div>
+                <h1 class="text-2xl font-bold text-white flex items-center">
+                    <span class="bg-white text-pokemon-red rounded-full px-3 py-1 mr-3 text-sm">
+                        #{{ pokemon.No_Pokemon }}
+                    </span>
+                    {{ pokemon.Nombre }}
+                </h1>
+            </div>
+            
+            <div class="flex space-x-3">
+                <a href="{% url 'pokemon_update' pokemon.No_Pokemon %}" 
+                   class="flex items-center px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-full shadow-md transition-all duration-200 transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>Editar</span>
+                </a>
+                <button 
+                class="flex items-center px-4 py-2 bg-pokemon-red hover:bg-red-700 text-white rounded-full shadow-md transition-all duration-200"
+                hx-get="{% url 'pokemon_delete' pokemon.No_Pokemon %}"
+                hx-target="#modal-content"
+                hx-trigger="click"
+                hx-swap="innerHTML"
+                @click="document.getElementById('modal-container').classList.remove('hidden');"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Eliminar</span>
+            </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="container mx-auto px-4 mt-6">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+            <!-- Pokemon info -->
+            <div class="bg-gray-100 flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center">
+                    <div class="bg-pokemon-blue text-white rounded-full h-12 w-12 flex items-center justify-center mr-4 shadow-md">
+                        <span class="font-bold text-lg">#{{ pokemon.No_Pokemon }}</span>
+                    </div>
+                    <h1 class="text-4xl font-bold text-gray-800 mr-4">{{ pokemon.Nombre }}</h1>
+                    
+                    <!-- Type badges -->
+                    <div class="flex flex-wrap gap-2">
+                        {% for tipo in tipos %}
+                        <span class="type-badge bg-type-{{ tipo.tipo.Nombre_Tipo|lower }} px-3 py-1 shadow-sm">
+                            {{ tipo.tipo.Nombre_Tipo }}
+                        </span>
+                        {% empty %}
+                        <a href="{% url 'pokemon_tipo_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                           class="type-badge bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg> 
+                            Añadir tipo
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="flex-shrink-0">
+                    <div>
+                        <button id="favorite-btn"
+                                hx-post="{% url 'pokemon_favorite' pokemon.No_Pokemon %}"
+                                hx-trigger="click"
+                                hx-swap="outerHTML"
+                                class="p-2 rounded-full hover:bg-red-100 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" 
+                                     fill="{% if pokemon.is_favorite %}currentColor{% else %}none{% endif %}" 
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:flex">
+                    <!-- Pokémon image section -->
+                    <div class="md:w-1/3 bg-gradient-to-br from-gray-100 to-gray-200 p-8 flex items-center justify-center">
+                        <div class="relative w-full">
+                            {% if pokemon.Ruta_Imagen %}
+                                <img src="{{ pokemon.Ruta_Imagen }}" alt="{{ pokemon.Nombre }}" 
+                                    class="w-full object-contain max-h-80 transform hover:scale-105 transition-transform duration-300 filter drop-shadow-lg">
+                            {% else %}
+                                <div class="w-64 h-64 mx-auto bg-gray-300 rounded-full flex items-center justify-center">
+                                    <span class="text-6xl font-bold text-gray-500">#{{ pokemon.No_Pokemon }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="mt-4 flex justify-center">
+                                <div class="bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center shadow-md">
+                                    <div class="mr-4">
+                                        <div class="text-xs text-gray-400">Altura</div>
+                                        <div class="font-medium">{{ pokemon.Altura|default:"??" }} m</div>
+                                    </div>
+                                    <div class="h-10 border-r border-gray-600 mx-2"></div>
+                                    <div>
+                                        <div class="text-xs text-gray-400">Peso</div>
+                                        <div class="font-medium">{{ pokemon.Peso|default:"??" }} kg</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Info tabs section -->
+                    <div class="md:w-2/3 p-6">
+                        <!-- Tab navigation -->
+                        <div class="border-b border-gray-200 mb-6">
+                            <nav class="flex space-x-8" aria-label="Tabs">
+                                <button @click="activeTab = 'info'" 
+                                        :class="{'border-pokemon-red text-pokemon-red': activeTab === 'info', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'info'}"
+                                        class="py-4 px-1 border-b-2 font-medium text-sm">
+                                    Información
+                                </button>
+                                <button @click="activeTab = 'stats'" 
+                                        :class="{'border-pokemon-red text-pokemon-red': activeTab === 'stats', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'stats'}"
+                                        class="py-4 px-1 border-b-2 font-medium text-sm">
+                                    Habilidades
+                                </button>
+                                <button @click="activeTab = 'moves'" 
+                                        :class="{'border-pokemon-red text-pokemon-red': activeTab === 'moves', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'moves'}"
+                                        class="py-4 px-1 border-b-2 font-medium text-sm">
+                                    Movimientos
+                                </button>
+                                <button @click="activeTab = 'evolution'" 
+                                        :class="{'border-pokemon-red text-pokemon-red': activeTab === 'evolution', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'evolution'}"
+                                        class="py-4 px-1 border-b-2 font-medium text-sm">
+                                    Más Datos
+                                </button>
+                            </nav>
+                        </div>
+                        
+                        <!-- Tab content -->
+                        <!-- Info tab -->
+                        <div x-show="activeTab === 'info'" class="animate-fade-in">
+                            {% if pokemon.Descripcion %}
+                            <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                                <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-2">Descripción</h2>
+                                <p class="text-gray-700">{{ pokemon.Descripcion }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Abilities -->
+                            <div class="mb-8">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h2 class="text-lg font-semibold text-gray-800">Habilidades</h2>
+                                    <a href="{% url 'pokemon_habilidad_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                                       class="text-pokemon-red hover:text-red-700 text-sm font-medium flex items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Añadir
+                                    </a>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    {% for habilidad in habilidades %}
+                                    <div class="bg-white p-3 rounded-lg border border-gray-200 flex justify-between items-center">
+                                        <div>
+                                            <h3 class="font-medium text-gray-900">{{ habilidad.habilidad.Nombre_Habilidad }}</h3>
+                                            {% if habilidad.es_oculta %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                Habilidad Oculta
+                                            </span>
+                                            {% endif %}
+                                            {% if habilidad.habilidad.Descripcion %}
+                                            <p class="text-sm text-gray-500 mt-1">{{ habilidad.habilidad.Descripcion }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex items-center">
+                                            <a href="{% url 'pokemon_habilidad_update' habilidad.id %}" class="text-gray-400 hover:text-blue-500 mx-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                            </a>
+                                            <button 
+                                                class="text-gray-400 hover:text-red-500 mx-1"
+                                                hx-get="{% url 'pokemon_habilidad_delete' habilidad.id %}"
+                                                hx-target="#modal-content"
+                                                hx-trigger="click"
+                                                hx-swap="innerHTML"
+                                                @click="document.getElementById('modal-container').classList.remove('hidden');">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="text-center py-6 bg-gray-50 rounded-lg">
+                                        <p class="text-gray-500 mb-4">No hay habilidades registradas</p>
+                                        <a href="{% url 'pokemon_habilidad_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                                           class="btn-primary py-2 px-4 inline-flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            Añadir Habilidad
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Categories -->
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h2 class="text-lg font-semibold text-gray-800">Categorías</h2>
+                                    <a href="{% url 'pokemon_categoria_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                                       class="text-pokemon-red hover:text-red-700 text-sm font-medium flex items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Añadir
+                                    </a>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {% for categoria in categorias %}
+                                    <div class="bg-white p-3 rounded-lg border border-gray-200 flex flex-col">
+                                        <div class="flex justify-between">
+                                            <span class="font-medium text-gray-900">{{ categoria.categoria.Nombre_Categoria }}</span>
+                                            <div class="flex">
+                                                <a href="{% url 'pokemon_categoria_update' categoria.id %}" class="text-gray-400 hover:text-blue-500 mx-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </a>
+                                                <button 
+                                                    class="text-gray-400 hover:text-red-500 mx-1"
+                                                    hx-get="{% url 'pokemon_categoria_delete' categoria.id %}"
+                                                    hx-target="#modal-content"
+                                                    hx-trigger="click"
+                                                    hx-swap="innerHTML"
+                                                    @click="document.getElementById('modal-container').classList.remove('hidden');">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                                        <p class="text-gray-500 text-sm">Sin categoría asignada</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <!-- Grupos Huevo -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h2 class="text-lg font-semibold text-gray-800">Grupos Huevo</h2>
+                                        <a href="{% url 'pokemon_grupo_huevo_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                                           class="text-pokemon-red hover:text-red-700 text-sm font-medium flex items-center transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Añadir
+                                        </a>
+                                    </div>
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        {% for grupo in grupos_huevo %}
+                                        <div class="bg-white p-3 rounded-lg border border-gray-200 flex flex-col">
+                                            <div class="flex justify-between">
+                                                <span class="font-medium text-gray-900">{{ grupo.grupo_huevo.nombre_huevo }}</span>
+                                                <div class="flex">
+                                                    <a href="{% url 'pokemon_grupo_huevo_update' grupo.id %}" class="text-gray-400 hover:text-blue-500 mx-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                        </svg>
+                                                    </a>
+                                                    <button 
+                                                        class="text-gray-400 hover:text-red-500 mx-1"
+                                                        hx-get="{% url 'pokemon_grupo_huevo_delete' grupo.id %}"
+                                                        hx-target="#modal-content"
+                                                        hx-trigger="click"
+                                                        hx-swap="innerHTML"
+                                                        @click="document.getElementById('modal-container').classList.remove('hidden');">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="bg-gray-50 rounded-lg p-4 text-center">
+                                            <p class="text-gray-500 text-sm">No hay grupos huevo asignados</p>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats tab -->
+                        <div x-show="activeTab === 'stats'" class="animate-fade-in" x-cloak>
+                            <!-- Generations -->
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h2 class="text-lg font-semibold text-gray-800">Generaciones</h2>
+                                    <a href="{% url 'pokemon_generacion_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                                       class="text-pokemon-red hover:text-red-700 text-sm font-medium flex items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Añadir
+                                    </a>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {% for generacion in generaciones %}
+                                    <div class="bg-white p-3 rounded-lg border border-gray-200 flex flex-col">
+                                        <div class="flex justify-between">
+                                            <div>
+                                                <span class="font-medium text-gray-900">{{ generacion.generacion.Juegos }}</span>
+                                                {% if generacion.generacion.Numero %}
+                                                <span class="inline-flex items-center ml-2 px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                    Gen {{ generacion.generacion.Numero }}
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex">
+                                                <a href="{% url 'pokemon_generacion_update' generacion.id %}" class="text-gray-400 hover:text-blue-500 mx-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </a>
+                                                <button 
+                                                    class="text-gray-400 hover:text-red-500 mx-1"
+                                                    hx-get="{% url 'pokemon_generacion_delete' generacion.id %}"
+                                                    hx-target="#modal-content"
+                                                    hx-trigger="click"
+                                                    hx-swap="innerHTML"
+                                                    @click="document.getElementById('modal-container').classList.remove('hidden');">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                                        <p class="text-gray-500 text-sm">No hay generaciones asignadas</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Moves tab -->
+                        <div x-show="activeTab === 'moves'" class="animate-fade-in" x-cloak>
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-lg font-semibold text-gray-800">Movimientos</h2>
+                                <a href="{% url 'pokemon_movimiento_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                                   class="bg-pokemon-blue hover:bg-blue-700 text-white py-1 px-3 rounded-full text-sm shadow-sm flex items-center transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Añadir Movimiento
+                                </a>
+                            </div>
+                            
+                            {% if movimientos %}
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Movimiento
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Nivel
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Categoría
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Potencia
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Precisión
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                PP
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Acciones
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        {% for movimiento in movimientos %}
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="font-medium text-gray-900">{{ movimiento.movimiento.Nombre_Movimiento }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-gray-900">{{ movimiento.nivel_aprendizaje|default:"—" }}</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                    {% if movimiento.movimiento.Categoria == 'Físico' %}
+                                                        bg-red-100 text-red-800
+                                                    {% elif movimiento.movimiento.Categoria == 'Especial' %}
+                                                        bg-blue-100 text-blue-800
+                                                    {% else %}
+                                                        bg-green-100 text-green-800
+                                                    {% endif %}
+                                                ">
+                                                  {{ movimiento.movimiento.Categoria }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                                                {{ movimiento.movimiento.Potencia }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                                                {{ movimiento.movimiento.Precision }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                                                {{ movimiento.movimiento.Puntos_Uso }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <div class="flex items-center justify-end">
+                                                    <a href="{% url 'pokemon_movimiento_update' movimiento.id %}" class="text-gray-400 hover:text-blue-500 mx-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                        </svg>
+                                                    </a>
+                                                    <button 
+                                                        class="text-gray-400 hover:text-red-500 mx-1"
+                                                        hx-get="{% url 'pokemon_movimiento_delete' movimiento.id %}"
+                                                        hx-target="#modal-content"
+                                                        hx-trigger="click"
+                                                        hx-swap="innerHTML"
+                                                        @click="document.getElementById('modal-container').classList.remove('hidden');">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="text-gray-400 mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-500 mb-4">No hay movimientos registrados para este Pokémon</p>
+                                <a href="{% url 'pokemon_movimiento_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
+                                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-pokemon-red hover:bg-red-700 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    Añadir Primer Movimiento
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Evolution tab -->
+                        <div x-show="activeTab === 'evolution'" class="animate-fade-in" x-cloak>
+                            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                                <div class="text-center mb-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                    <h3 class="text-lg font-medium text-gray-700">Cadena Evolutiva</h3>
+                                    <p class="text-gray-500 text-sm">Funcionalidad en desarrollo...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Action Button -->
+    <div class="fab">
+        <div class="fab-buttons" :class="{'active': fabActive}">
+            <a href="{% url 'pokemon_update' pokemon.No_Pokemon %}" class="fab-button bg-yellow-400 hover:bg-yellow-500 text-white">
+                <span class="fab-label">Editar</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+            </a>
+            <button hx-get="{% url 'pokemon_delete' pokemon.No_Pokemon %}"
+                    hx-target="#modal-content"
+                    hx-trigger="click"
+                    hx-swap="innerHTML"
+                    @click="document.getElementById('modal-container').classList.remove('hidden');"
+                    class="fab-button bg-red-500 hover:bg-red-600 text-white">
+                <span class="fab-label">Eliminar</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+        </div>
+        <button @click="toggleFab" class="h-14 w-14 rounded-full bg-pokemon-red hover:bg-red-700 flex items-center justify-center shadow-lg transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-show="!fabActive">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-show="fabActive">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+<!-- Modal for confirmation dialogs -->
+<div id="modal-container" class="fixed inset-0 overflow-y-auto hidden" style="z-index: 50;">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true" onclick="document.getElementById('modal-container').classList.add('hidden');">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div id="modal-content" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <!-- Modal content will be loaded here by HTMX -->
+        </div>
+    </div>
+</div>
+{% endblock %}

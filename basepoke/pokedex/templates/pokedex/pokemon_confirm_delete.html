@@ -1,0 +1,49 @@
+{% extends 'pokedex/base.html' %}
+
+{% block title %}Delete {{ pokemon.Nombre }} | Pokédex{% endblock %}
+
+{% block content %}
+<div class="pokemon-card max-w-lg mx-auto">
+    <div class="p-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Delete Pokémon</h1>
+        
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p>Are you sure you want to delete <strong>{{ pokemon.Nombre }}</strong>? This action cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-md p-4 flex items-center mb-6">
+            <div class="w-12 h-12 bg-pokemon-yellow rounded-full flex items-center justify-center mr-4">
+                {% if pokemon.Ruta_Imagen %}
+                    <img src="{{ pokemon.Ruta_Imagen }}" alt="{{ pokemon.Nombre }}" class="h-10 w-10 object-contain">
+                {% else %}
+                    <span class="text-lg font-bold text-gray-600">#{{ pokemon.No_Pokemon }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <h2 class="text-lg font-medium text-gray-900">{{ pokemon.Nombre }}</h2>
+                <p class="text-sm text-gray-500">#{{ pokemon.No_Pokemon }}</p>
+            </div>
+        </div>
+        
+        <form method="post" hx-boost="true">
+            {% csrf_token %}
+            <div class="flex justify-end space-x-3">
+                <a href="{% url 'pokemon_detail' pokemon.No_Pokemon %}" class="btn-secondary">Cancel</a>
+                <button type="submit" class="btn-danger">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
