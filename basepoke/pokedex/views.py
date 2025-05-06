@@ -438,6 +438,29 @@ class PokemonDeleteView(generic.DeleteView):
     template_name = 'pokedex/pokemon_confirm_delete.html'
     success_url = reverse_lazy('pokemon_list')
     pk_url_kwarg = 'no_pokemon'
+    
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        
+        # Check if this is an HTMX request (for the modal)
+        if request.headers.get('HX-Request'):
+            return render(request, 'pokedex/pokemon_delete_modal.html', {'pokemon': self.object})
+        
+        # Regular request (full page)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        pokemon_name = self.object.Nombre
+        
+        # Perform the delete
+        response = super().post(request, *args, **kwargs)
+        
+        # Add success message
+        messages.success(request, f'Pokémon {pokemon_name} ha sido eliminado correctamente.')
+        
+        return response
 
 # Class-based views for Movimiento
 class MovimientoListView(generic.ListView):
@@ -1362,7 +1385,7 @@ def preview_image(request):
     """View for previewing Pokemon images via HTMX"""
     if request.method == 'POST':
         image_url = request.POST.get('image_url', '')
-        if image_url:
+        if (image_url):
             # You could add validation here
             return HttpResponse(f'<img src="{image_url}" class="img-preview" />')
     return HttpResponse('')

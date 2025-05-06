@@ -370,13 +370,15 @@
     <script>
         // HTMX loading indicator
         document.body.addEventListener('htmx:beforeRequest', function(event) {
-            document.getElementById('htmx-indicator').classList.remove('hidden');
-            document.getElementById('htmx-indicator').classList.add('flex');
+            var indicator = document.getElementById('htmx-indicator');
+            indicator.classList.remove('hidden');
+            indicator.style.display = 'flex';
         });
         
         document.body.addEventListener('htmx:afterRequest', function(event) {
-            document.getElementById('htmx-indicator').classList.add('hidden');
-            document.getElementById('htmx-indicator').classList.remove('flex');
+            var indicator = document.getElementById('htmx-indicator');
+            indicator.classList.add('hidden');
+            indicator.style.display = 'none';
         });
         
         // Handle HTMX modal display
@@ -384,6 +386,13 @@
             if (event.detail.target.id === 'modal-content') {
                 document.getElementById('modal-container').classList.remove('hidden');
                 document.getElementById('modal-container').classList.add('flex');
+            }
+        });
+        
+        // Close modal when clicking Cancel button within modal
+        document.addEventListener('click', function(event) {
+            if (event.target.closest('.modal-cancel-button')) {
+                document.getElementById('modal-container').classList.add('hidden');
             }
         });
     </script>
