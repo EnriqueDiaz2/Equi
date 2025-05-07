@@ -337,9 +337,9 @@
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0 flex items-center">
-                    <div class="w-8 h-8 bg-gradient-to-b from-red-500 to-white rounded-full border border-gray-800 relative mr-3">
-                        <div class="absolute w-2 h-2 bg-white rounded-full border border-gray-800 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-                    </div>
+                    <a href="{% url 'index' %}" class="flex items-center">
+                        <img src="{% static 'pokedex/images/pokedex.png' %}" alt="Pokéball Logo" class="w-10 h-10 mr-2">
+                    </a>
                     <div>
                         <h3 class="text-lg font-semibold">Pokédex Nacional</h3>
                         <p class="text-sm text-gray-400">Sistema de gestión de datos Pokémon</p>
