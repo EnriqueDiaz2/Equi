@@ -1,4 +1,1 @@
 # This file marks the pokedex directory as a Python package
-# IC KK CRK
-
-print("Hola Mundo!")
