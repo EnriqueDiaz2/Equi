@@ -48,8 +48,7 @@
     <!-- HTMX for interactive elements -->
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
     <!-- Alpine.js for UI interactions -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>    <style>
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -66,11 +65,40 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #ff0000;
         }
-        
         /* Type badges */
         .type-badge {
             @apply inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium text-white shadow-sm;
         }
+        
+        .type-badge::before {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 4px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+        }
+        
+        /* Pokemon type background colors */
+        .bg-type-normal { background-color: #A8A878; }
+        .bg-type-fuego, .bg-type-fire { background-color: #F08030; }
+        .bg-type-agua, .bg-type-water { background-color: #6890F0; }
+        .bg-type-electrico, .bg-type-electric { background-color: #F8D030; }
+        .bg-type-planta, .bg-type-grass { background-color: #78C850; }
+        .bg-type-hielo, .bg-type-ice { background-color: #98D8D8; }
+        .bg-type-lucha, .bg-type-fighting { background-color: #C03028; }
+        .bg-type-veneno, .bg-type-poison { background-color: #A040A0; }
+        .bg-type-tierra, .bg-type-ground { background-color: #E0C068; }
+        .bg-type-volador, .bg-type-flying { background-color: #A890F0; }
+        .bg-type-psiquico, .bg-type-psychic { background-color: #F85888; }
+        .bg-type-bicho, .bg-type-bug { background-color: #A8B820; }
+        .bg-type-roca, .bg-type-rock { background-color: #B8A038; }
+        .bg-type-fantasma, .bg-type-ghost { background-color: #705898; }
+        .bg-type-dragon, .bg-type-dragón { background-color: #7038F8; }
+        .bg-type-siniestro, .bg-type-dark { background-color: #705848; }
+        .bg-type-acero, .bg-type-steel { background-color: #B8B8D0; }
+        .bg-type-hada, .bg-type-fairy { background-color: #EE99AC; }
         
         /* Pokeball loader */
         .pokeball-loader {

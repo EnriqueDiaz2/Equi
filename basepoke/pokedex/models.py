@@ -11,6 +11,9 @@ class Pokemon(models.Model):
     
     def __str__(self):
         return f"{self.No_Pokemon} - {self.Nombre}"
+    
+    def get_tipos(self):
+        return self.tipos.all()
         
     class Meta:
         verbose_name = "Pokémon"

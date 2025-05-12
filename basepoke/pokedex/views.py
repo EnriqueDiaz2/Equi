@@ -397,7 +397,11 @@ class PokemonDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pokemon = self.get_object()
-        context['tipos'] = PokemonTipo.objects.filter(pokemon=pokemon)
+        
+        # Get types with ordering to ensure consistent display
+        context['tipos'] = PokemonTipo.objects.filter(pokemon=pokemon).select_related('tipo').order_by('id')
+        
+        # Get other related data
         context['habilidades'] = PokemonHabilidad.objects.filter(pokemon=pokemon)
         context['movimientos'] = PokemonMovimiento.objects.filter(pokemon=pokemon)
         context['categorias'] = PokemonCategoria.objects.filter(pokemon=pokemon)
@@ -752,7 +756,7 @@ class TipoDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         tipo = self.get_object()
         context['pokemons'] = PokemonTipo.objects.filter(tipo=tipo)
-        context['descripcion'] = tipo.Descripcion  # Añadir el campo de descripción para poder mostrarlo en texto negro
+        # Remove reference to non-existent Descripcion field
         return context
 
 class TipoCreateView(generic.CreateView):
@@ -799,7 +803,7 @@ class TipoCreateView(generic.CreateView):
     
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Tipo {self.object.nombre} ha sido creado exitosamente!')
+        messages.success(self.request, f'Tipo {self.object.Nombre_Tipo} ha sido creado exitosamente!')
         return response
     
     def get_success_url(self):
@@ -817,8 +821,8 @@ class TipoUpdateView(generic.UpdateView):
                 tipo = self.get_object()
                 return JsonResponse({
                     "id": tipo.id,
-                    "nombre": tipo.nombre,
-                    "Descripcion": tipo.Descripcion,
+                    "Nombre_Tipo": tipo.Nombre_Tipo,
+                    "Color": tipo.Color,
                     # Add other fields as needed
                 })
             except Tipo.DoesNotExist:
@@ -847,10 +851,10 @@ class TipoUpdateView(generic.UpdateView):
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
         return super().put(request, *args, **kwargs) if hasattr(super(), 'put') else HttpResponse(status=405)
-    
+        
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Tipo {self.object.nombre} ha sido actualizado exitosamente!')
+        messages.success(self.request, f'Tipo {self.object.Nombre_Tipo} ha sido actualizado exitosamente!')
         return response
     
     def get_success_url(self):
@@ -1149,8 +1153,19 @@ class PokemonTipoCreateView(generic.CreateView):
     template_name = 'pokedex/pokemon_tipo_form.html'
     
     def form_valid(self, form):
+        # Check if this Pokemon already has this type
+        pokemon = form.cleaned_data["pokemon"]
+        tipo = form.cleaned_data["tipo"]
+        
+        # Check if there's already a record for this Pokemon-Tipo combination
+        existing_record = PokemonTipo.objects.filter(pokemon=pokemon, tipo=tipo).first()
+        
+        if (existing_record):
+            messages.warning(self.request, f'El tipo {tipo} ya está asignado a {pokemon}')
+            return redirect('pokemon_detail', no_pokemon=pokemon.No_Pokemon)
+            
         response = super().form_valid(form)
-        messages.success(self.request, f'Tipo {form.cleaned_data["tipo"]} asignado a {form.cleaned_data["pokemon"]} correctamente!')
+        messages.success(self.request, f'Tipo {tipo} asignado a {pokemon} correctamente!')
         return response
     
     def get_success_url(self):
@@ -1177,7 +1192,18 @@ class PokemonTipoUpdateView(generic.UpdateView):
 class PokemonTipoDeleteView(generic.DeleteView):
     model = PokemonTipo
     template_name = 'pokedex/pokemon_tipo_confirm_delete.html'
-    success_url = reverse_lazy('pokemon_tipo_list')
+    
+    def get_success_url(self):
+        return reverse_lazy('pokemon_detail', kwargs={'no_pokemon': self.object.pokemon.No_Pokemon})
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        pokemon = self.object.pokemon
+        tipo = self.object.tipo
+        success_url = self.get_success_url()
+        self.object.delete()
+        messages.success(request, f'Tipo {tipo.Nombre_Tipo} eliminado correctamente de {pokemon.Nombre}.')
+        return redirect(success_url)
 
 # PokemonHabilidad views
 class PokemonHabilidadListView(generic.ListView):

@@ -8,11 +8,19 @@
         {% endif %}
     </div>
     <div class="flex-1">
-        <h3 class="text-xl font-semibold">{{ pokemon.Nombre }}</h3>
-        <div class="flex space-x-4 text-gray-500 text-sm">
+        <h3 class="text-xl font-semibold">{{ pokemon.Nombre }}</h3>        <div class="flex space-x-4 text-gray-500 text-sm">
             <span>No. {{ pokemon.No_Pokemon }}</span>
             {% if pokemon.Altura %}<span>Height: {{ pokemon.Altura }} m</span>{% endif %}
             {% if pokemon.Peso %}<span>Weight: {{ pokemon.Peso }} kg</span>{% endif %}
+        </div>        <div class="flex flex-wrap gap-1 mt-2">
+            {% for tipo in pokemon.get_tipos %}
+            <span class="type-badge bg-type-{{ tipo.tipo.Nombre_Tipo|lower }} text-xs px-2 py-1 inline-flex items-center rounded-full shadow-sm">
+                <span class="w-2 h-2 bg-white bg-opacity-50 rounded-full mr-1"></span>
+                {{ tipo.tipo.Nombre_Tipo }}
+            </span>
+            {% empty %}
+            <span class="text-xs text-gray-500">Sin tipos</span>
+            {% endfor %}
         </div>
     </div>
     <div class="flex space-x-2">

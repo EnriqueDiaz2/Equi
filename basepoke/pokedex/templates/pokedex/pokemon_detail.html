@@ -245,22 +245,39 @@
                         <span class="font-bold text-lg">#{{ pokemon.No_Pokemon }}</span>
                     </div>
                     <h1 class="text-4xl font-bold text-gray-800 mr-4">{{ pokemon.Nombre }}</h1>
-                    
-                    <!-- Type badges -->
+                      <!-- Type badges -->
                     <div class="flex flex-wrap gap-2">
                         {% for tipo in tipos %}
-                        <span class="type-badge bg-type-{{ tipo.tipo.Nombre_Tipo|lower }} px-3 py-1 shadow-sm">
-                            {{ tipo.tipo.Nombre_Tipo }}
-                        </span>
+                        <div class="relative group">
+                            <span class="type-badge bg-type-{{ tipo.tipo.Nombre_Tipo|lower }} px-3 py-1 shadow-sm">
+                                {{ tipo.tipo.Nombre_Tipo }}
+                            </span>
+                            <!-- Delete button as a tooltip -->
+                            <form method="post" action="{% url 'pokemon_tipo_delete' tipo.id %}" 
+                                  class="hidden group-hover:block absolute -top-2 -right-2"
+                                  onsubmit="return confirm('¿Estás seguro de eliminar este tipo?')">
+                                {% csrf_token %}
+                                <button type="submit" title="Eliminar tipo {{ tipo.tipo.Nombre_Tipo }}" class="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transform transition-transform hover:scale-110">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    <span class="sr-only">Eliminar tipo {{ tipo.tipo.Nombre_Tipo }}</span>
+                                </button>
+                            </form>
+                        </div>
                         {% empty %}
+                        <span class="text-gray-500 italic text-sm">No hay tipos asignados</span>
+                        {% endfor %}
+                        
+                        <!-- Always show 'Add Type' button -->
                         <a href="{% url 'pokemon_tipo_create' %}?pokemon={{ pokemon.No_Pokemon }}" 
-                           class="type-badge bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           class="type-badge bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors"
+                           title="Añadir un nuevo tipo al Pokémon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg> 
                             Añadir tipo
                         </a>
-                        {% endfor %}
                     </div>
                 </div>
                 
