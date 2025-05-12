@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from .models import (
-    Pokemon, Movimiento, Habilidad, Tipo, Categoria, 
-    Generacion, Grupo_Huevo, PokemonTipo, PokemonHabilidad, 
-    PokemonMovimiento, PokemonCategoria, PokemonGeneracion, 
+    Pokemon, Movimiento, Habilidad, Tipo, Categoria,
+    Generacion, Grupo_Huevo, PokemonTipo, PokemonHabilidad,
+    PokemonMovimiento, PokemonCategoria, PokemonGeneracion,
     PokemonGrupoHuevo
 )
 from django.views.decorators.csrf import csrf_exempt
@@ -12,7 +12,7 @@ import json
 from django.views import generic
 from django.urls import reverse_lazy
 from .forms import (
-    PokemonForm, MovimientoForm, HabilidadForm, TipoForm, 
+    PokemonForm, MovimientoForm, HabilidadForm, TipoForm,
     CategoriaForm, GeneracionForm, GrupoHuevoForm, PokemonTipoForm,
     PokemonHabilidadForm, PokemonMovimientoForm, PokemonCategoriaForm,
     PokemonGeneracionForm, PokemonGrupoHuevoForm
@@ -20,6 +20,8 @@ from .forms import (
 from django.template.loader import render_to_string
 
 # API view for CRUD operations
+
+
 @csrf_exempt
 def pokemon_crud(request):
     if request.method == 'GET':
@@ -29,7 +31,8 @@ def pokemon_crud(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         pokemon = Pokemon.objects.create(**data)
-        return JsonResponse({'No_Pokemon': pokemon.No_Pokemon, 'message': 'Pokemon created successfully'}, status=201)
+        return JsonResponse({'No_Pokemon': pokemon.No_Pokemon,
+                            'message': 'Pokemon created successfully'}, status=201)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
@@ -58,6 +61,8 @@ def pokemon_crud(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 # API endpoints for other models
+
+
 @csrf_exempt
 def movimiento_crud(request):
     if request.method == 'GET':
@@ -67,7 +72,8 @@ def movimiento_crud(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         movimiento = Movimiento.objects.create(**data)
-        return JsonResponse({'id': movimiento.id, 'message': 'Movimiento created successfully'}, status=201)
+        return JsonResponse(
+            {'id': movimiento.id, 'message': 'Movimiento created successfully'}, status=201)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
@@ -95,6 +101,7 @@ def movimiento_crud(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+
 @csrf_exempt
 def habilidad_crud(request):
     if request.method == 'GET':
@@ -104,7 +111,8 @@ def habilidad_crud(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         habilidad = Habilidad.objects.create(**data)
-        return JsonResponse({'id': habilidad.id, 'message': 'Habilidad created successfully'}, status=201)
+        return JsonResponse(
+            {'id': habilidad.id, 'message': 'Habilidad created successfully'}, status=201)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
@@ -132,6 +140,7 @@ def habilidad_crud(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+
 @csrf_exempt
 def tipo_crud(request):
     if request.method == 'GET':
@@ -141,7 +150,8 @@ def tipo_crud(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         tipo = Tipo.objects.create(**data)
-        return JsonResponse({'id': tipo.id, 'message': 'Tipo created successfully'}, status=201)
+        return JsonResponse(
+            {'id': tipo.id, 'message': 'Tipo created successfully'}, status=201)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
@@ -169,6 +179,7 @@ def tipo_crud(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+
 @csrf_exempt
 def categoria_crud(request):
     if request.method == 'GET':
@@ -178,7 +189,8 @@ def categoria_crud(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         categoria = Categoria.objects.create(**data)
-        return JsonResponse({'id': categoria.id, 'message': 'Categoria created successfully'}, status=201)
+        return JsonResponse(
+            {'id': categoria.id, 'message': 'Categoria created successfully'}, status=201)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
@@ -206,6 +218,7 @@ def categoria_crud(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+
 @csrf_exempt
 def generacion_crud(request):
     if request.method == 'GET':
@@ -215,7 +228,8 @@ def generacion_crud(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         generacion = Generacion.objects.create(**data)
-        return JsonResponse({'id': generacion.id, 'message': 'Generacion created successfully'}, status=201)
+        return JsonResponse(
+            {'id': generacion.id, 'message': 'Generacion created successfully'}, status=201)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
@@ -243,6 +257,7 @@ def generacion_crud(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+
 @csrf_exempt
 def grupo_huevo_crud(request):
     if request.method == 'GET':
@@ -252,7 +267,8 @@ def grupo_huevo_crud(request):
     elif request.method == 'POST':
         data = json.loads(request.body)
         grupo_huevo = Grupo_Huevo.objects.create(**data)
-        return JsonResponse({'id': grupo_huevo.id, 'message': 'Grupo Huevo created successfully'}, status=201)
+        return JsonResponse(
+            {'id': grupo_huevo.id, 'message': 'Grupo Huevo created successfully'}, status=201)
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
@@ -263,7 +279,8 @@ def grupo_huevo_crud(request):
                 if key != 'id':
                     setattr(grupo_huevo, key, value)
             grupo_huevo.save()
-            return JsonResponse({'message': 'Grupo Huevo updated successfully'})
+            return JsonResponse(
+                {'message': 'Grupo Huevo updated successfully'})
         except Grupo_Huevo.DoesNotExist:
             return JsonResponse({'error': 'Grupo Huevo not found'}, status=404)
 
@@ -273,12 +290,14 @@ def grupo_huevo_crud(request):
         try:
             grupo_huevo = Grupo_Huevo.objects.get(id=grupo_huevo_id)
             grupo_huevo.delete()
-            return JsonResponse({'message': 'Grupo Huevo deleted successfully'})
+            return JsonResponse(
+                {'message': 'Grupo Huevo deleted successfully'})
         except Grupo_Huevo.DoesNotExist:
             return JsonResponse({'error': 'Grupo Huevo not found'}, status=404)
 
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 
 @csrf_exempt
 def pokemon_tipo_crud(request):
@@ -293,8 +312,10 @@ def pokemon_tipo_crud(request):
         try:
             pokemon = Pokemon.objects.get(No_Pokemon=pokemon_id)
             tipo = Tipo.objects.get(id=tipo_id)
-            pokemon_tipo = PokemonTipo.objects.create(pokemon=pokemon, tipo=tipo)
-            return JsonResponse({'id': pokemon_tipo.id, 'message': 'Pokemon Tipo created successfully'}, status=201)
+            pokemon_tipo = PokemonTipo.objects.create(
+                pokemon=pokemon, tipo=tipo)
+            return JsonResponse(
+                {'id': pokemon_tipo.id, 'message': 'Pokemon Tipo created successfully'}, status=201)
         except Pokemon.DoesNotExist:
             return JsonResponse({'error': 'Pokemon not found'}, status=404)
         except Tipo.DoesNotExist:
@@ -306,13 +327,16 @@ def pokemon_tipo_crud(request):
         try:
             pokemon_tipo = PokemonTipo.objects.get(id=pokemon_tipo_id)
             if 'pokemon_id' in data:
-                pokemon_tipo.pokemon = Pokemon.objects.get(No_Pokemon=data['pokemon_id'])
+                pokemon_tipo.pokemon = Pokemon.objects.get(
+                    No_Pokemon=data['pokemon_id'])
             if 'tipo_id' in data:
                 pokemon_tipo.tipo = Tipo.objects.get(id=data['tipo_id'])
             pokemon_tipo.save()
-            return JsonResponse({'message': 'Pokemon Tipo updated successfully'})
+            return JsonResponse(
+                {'message': 'Pokemon Tipo updated successfully'})
         except PokemonTipo.DoesNotExist:
-            return JsonResponse({'error': 'Pokemon Tipo not found'}, status=404)
+            return JsonResponse(
+                {'error': 'Pokemon Tipo not found'}, status=404)
         except Pokemon.DoesNotExist:
             return JsonResponse({'error': 'Pokemon not found'}, status=404)
         except Tipo.DoesNotExist:
@@ -324,12 +348,15 @@ def pokemon_tipo_crud(request):
         try:
             pokemon_tipo = PokemonTipo.objects.get(id=pokemon_tipo_id)
             pokemon_tipo.delete()
-            return JsonResponse({'message': 'Pokemon Tipo deleted successfully'})
+            return JsonResponse(
+                {'message': 'Pokemon Tipo deleted successfully'})
         except PokemonTipo.DoesNotExist:
-            return JsonResponse({'error': 'Pokemon Tipo not found'}, status=404)
+            return JsonResponse(
+                {'error': 'Pokemon Tipo not found'}, status=404)
 
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+
 
 @csrf_exempt
 def pokemon_habilidad_crud(request):
@@ -344,8 +371,10 @@ def pokemon_habilidad_crud(request):
         try:
             pokemon = Pokemon.objects.get(No_Pokemon=pokemon_id)
             habilidad = Habilidad.objects.get(id=habilidad_id)
-            pokemon_habilidad = PokemonHabilidad.objects.create(pokemon=pokemon, habilidad=habilidad)
-            return JsonResponse({'id': pokemon_habilidad.id, 'message': 'Pokemon Habilidad created successfully'}, status=201)
+            pokemon_habilidad = PokemonHabilidad.objects.create(
+                pokemon=pokemon, habilidad=habilidad)
+            return JsonResponse(
+                {'id': pokemon_habilidad.id, 'message': 'Pokemon Habilidad created successfully'}, status=201)
         except Pokemon.DoesNotExist:
             return JsonResponse({'error': 'Pokemon not found'}, status=404)
         except Habilidad.DoesNotExist:
@@ -355,15 +384,20 @@ def pokemon_habilidad_crud(request):
         data = json.loads(request.body)
         pokemon_habilidad_id = data.get('id')
         try:
-            pokemon_habilidad = PokemonHabilidad.objects.get(id=pokemon_habilidad_id)
+            pokemon_habilidad = PokemonHabilidad.objects.get(
+                id=pokemon_habilidad_id)
             if 'pokemon_id' in data:
-                pokemon_habilidad.pokemon = Pokemon.objects.get(No_Pokemon=data['pokemon_id'])
+                pokemon_habilidad.pokemon = Pokemon.objects.get(
+                    No_Pokemon=data['pokemon_id'])
             if 'habilidad_id' in data:
-                pokemon_habilidad.habilidad = Habilidad.objects.get(id=data['habilidad_id'])
+                pokemon_habilidad.habilidad = Habilidad.objects.get(
+                    id=data['habilidad_id'])
             pokemon_habilidad.save()
-            return JsonResponse({'message': 'Pokemon Habilidad updated successfully'})
+            return JsonResponse(
+                {'message': 'Pokemon Habilidad updated successfully'})
         except PokemonHabilidad.DoesNotExist:
-            return JsonResponse({'error': 'Pokemon Habilidad not found'}, status=404)
+            return JsonResponse(
+                {'error': 'Pokemon Habilidad not found'}, status=404)
         except Pokemon.DoesNotExist:
             return JsonResponse({'error': 'Pokemon not found'}, status=404)
         except Habilidad.DoesNotExist:
@@ -373,100 +407,125 @@ def pokemon_habilidad_crud(request):
         data = json.loads(request.body)
         pokemon_habilidad_id = data.get('id')
         try:
-            pokemon_habilidad = PokemonHabilidad.objects.get(id=pokemon_habilidad_id)
+            pokemon_habilidad = PokemonHabilidad.objects.get(
+                id=pokemon_habilidad_id)
             pokemon_habilidad.delete()
-            return JsonResponse({'message': 'Pokemon Habilidad deleted successfully'})
+            return JsonResponse(
+                {'message': 'Pokemon Habilidad deleted successfully'})
         except PokemonHabilidad.DoesNotExist:
-            return JsonResponse({'error': 'Pokemon Habilidad not found'}, status=404)
+            return JsonResponse(
+                {'error': 'Pokemon Habilidad not found'}, status=404)
 
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 # Class-based views for Pokemon
+
+
 class PokemonListView(generic.ListView):
     model = Pokemon
     template_name = 'pokedex/pokemon_list.html'
     context_object_name = 'pokemons'
+
 
 class PokemonDetailView(generic.DetailView):
     model = Pokemon
     template_name = 'pokedex/pokemon_detail.html'
     context_object_name = 'pokemon'
     pk_url_kwarg = 'no_pokemon'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pokemon = self.get_object()
-        
+
         # Get types with ordering to ensure consistent display
-        context['tipos'] = PokemonTipo.objects.filter(pokemon=pokemon).select_related('tipo').order_by('id')
-        
+        context['tipos'] = PokemonTipo.objects.filter(
+    pokemon=pokemon).select_related('tipo').order_by('id')
+
         # Get other related data
-        context['habilidades'] = PokemonHabilidad.objects.filter(pokemon=pokemon)
-        context['movimientos'] = PokemonMovimiento.objects.filter(pokemon=pokemon)
-        context['categorias'] = PokemonCategoria.objects.filter(pokemon=pokemon)
-        context['generaciones'] = PokemonGeneracion.objects.filter(pokemon=pokemon)
-        context['grupos_huevo'] = PokemonGrupoHuevo.objects.filter(pokemon=pokemon)
+        context['habilidades'] = PokemonHabilidad.objects.filter(
+            pokemon=pokemon)
+        context['movimientos'] = PokemonMovimiento.objects.filter(
+            pokemon=pokemon)
+        context['categorias'] = PokemonCategoria.objects.filter(
+            pokemon=pokemon)
+        context['generaciones'] = PokemonGeneracion.objects.filter(
+            pokemon=pokemon)
+        context['grupos_huevo'] = PokemonGrupoHuevo.objects.filter(
+            pokemon=pokemon)
         return context
+
 
 class PokemonCreateView(generic.CreateView):
     model = Pokemon
     form_class = PokemonForm
     template_name = 'pokedex/pokemon_form.html'
-    
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'¡Pokémon {self.object.Nombre} ha sido registrado exitosamente en la Pokédex!')
+        messages.success(
+    self.request,
+     f'¡Pokémon {self.object.Nombre} ha sido registrado exitosamente en la Pokédex!')
         return response
-    
+
     def get_success_url(self):
         # Redirect to home page instead of detail page
         return reverse_lazy('index')
+
 
 class PokemonUpdateView(generic.UpdateView):
     model = Pokemon
     form_class = PokemonForm
     template_name = 'pokedex/pokemon_form.html'
     pk_url_kwarg = 'no_pokemon'
-    
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Pokémon {self.object.Nombre} ha sido actualizado exitosamente!')
+        messages.success(
+    self.request,
+     f'Pokémon {self.object.Nombre} ha sido actualizado exitosamente!')
         return response
-        
+
     def get_success_url(self):
-        return reverse_lazy('pokemon_detail', kwargs={'no_pokemon': self.object.No_Pokemon})
+        return reverse_lazy('pokemon_detail', kwargs={
+                            'no_pokemon': self.object.No_Pokemon})
+
 
 class PokemonDeleteView(generic.DeleteView):
     model = Pokemon
     template_name = 'pokedex/pokemon_confirm_delete.html'
     success_url = reverse_lazy('pokemon_list')
     pk_url_kwarg = 'no_pokemon'
-    
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        
+
         # Check if this is an HTMX request (for the modal)
         if request.headers.get('HX-Request'):
-            return render(request, 'pokedex/pokemon_delete_modal.html', {'pokemon': self.object})
-        
+            return render(
+                request, 'pokedex/pokemon_delete_modal.html', {'pokemon': self.object})
+
         # Regular request (full page)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
-    
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         pokemon_name = self.object.Nombre
-        
+
         # Perform the delete
         response = super().post(request, *args, **kwargs)
-        
+
         # Add success message
-        messages.success(request, f'Pokémon {pokemon_name} ha sido eliminado correctamente.')
-        
+        messages.success(
+    request,
+     f'Pokémon {pokemon_name} ha sido eliminado correctamente.')
+
         return response
 
 # Class-based views for Movimiento
+
+
 class MovimientoListView(generic.ListView):
     model = Movimiento
     template_name = 'pokedex/movimiento_list.html'
@@ -479,23 +538,27 @@ class MovimientoListView(generic.ListView):
             return JsonResponse(movimientos, safe=False)
         return super().render_to_response(context, **response_kwargs)
 
+
 class MovimientoDetailView(generic.DetailView):
     model = Movimiento
     template_name = 'pokedex/movimiento_detail.html'
     context_object_name = 'movimiento'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         movimiento = self.get_object()
-        context['pokemons'] = PokemonMovimiento.objects.filter(movimiento=movimiento)
-        context['descripcion'] = movimiento.Descripcion  # Añadir el campo de descripción para poder mostrarlo en texto negro
+        context['pokemons'] = PokemonMovimiento.objects.filter(
+            movimiento=movimiento)
+        # Añadir el campo de descripción para poder mostrarlo en texto negro
+        context['descripcion'] = movimiento.Descripcion
         return context
+
 
 class MovimientoCreateView(generic.CreateView):
     model = Movimiento
     form_class = MovimientoForm
     template_name = 'pokedex/movimiento_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -518,13 +581,13 @@ class MovimientoCreateView(generic.CreateView):
                     "Puntos_Uso": 10
                 }
             }, json_dumps_params={'indent': 4})
-            
+
             # Añadir encabezados para una mejor presentación
             response['Content-Type'] = 'application/json'
             return response
-            
+
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -532,26 +595,29 @@ class MovimientoCreateView(generic.CreateView):
                 data = json.loads(request.body)
                 movimiento = Movimiento.objects.create(**data)
                 return JsonResponse({
-                    'id': movimiento.id, 
+                    'id': movimiento.id,
                     'message': 'Movimiento created successfully'
                 }, status=201)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
         return super().post(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Movimiento {self.object.nombre} ha sido creado exitosamente!')
+        messages.success(
+    self.request,
+     f'Movimiento {self.object.nombre} ha sido creado exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('movimiento_detail', kwargs={'pk': self.object.id})
+
 
 class MovimientoUpdateView(generic.UpdateView):
     model = Movimiento
     form_class = MovimientoForm
     template_name = 'pokedex/movimiento_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -564,15 +630,16 @@ class MovimientoUpdateView(generic.UpdateView):
                     # Add other fields as needed
                 })
             except Movimiento.DoesNotExist:
-                return JsonResponse({'error': 'Movimiento not found'}, status=404)
+                return JsonResponse(
+                    {'error': 'Movimiento not found'}, status=404)
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests with POST for updates (for compatibility)
         if request.path.startswith('/api/'):
             return self.put(request, *args, **kwargs)
         return super().post(request, *args, **kwargs)
-    
+
     def put(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -583,20 +650,26 @@ class MovimientoUpdateView(generic.UpdateView):
                     if key != 'id':
                         setattr(movimiento, key, value)
                 movimiento.save()
-                return JsonResponse({'message': 'Movimiento updated successfully'})
+                return JsonResponse(
+                    {'message': 'Movimiento updated successfully'})
             except Movimiento.DoesNotExist:
-                return JsonResponse({'error': 'Movimiento not found'}, status=404)
+                return JsonResponse(
+                    {'error': 'Movimiento not found'}, status=404)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
-        return super().put(request, *args, **kwargs) if hasattr(super(), 'put') else HttpResponse(status=405)
-    
+        return super().put(request, *args, **kwargs) if hasattr(super(),
+                     'put') else HttpResponse(status=405)
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Movimiento {self.object.nombre} ha sido actualizado exitosamente!')
+        messages.success(
+    self.request,
+     f'Movimiento {self.object.nombre} ha sido actualizado exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('movimiento_detail', kwargs={'pk': self.object.id})
+
 
 class MovimientoDeleteView(generic.DeleteView):
     model = Movimiento
@@ -604,11 +677,13 @@ class MovimientoDeleteView(generic.DeleteView):
     success_url = reverse_lazy('movimiento_list')
 
 # Class-based views for Habilidad
+
+
 class HabilidadListView(generic.ListView):
     model = Habilidad
     template_name = 'pokedex/habilidad_list.html'
     context_object_name = 'habilidades'
-    
+
     def render_to_response(self, context, **response_kwargs):
         # Check if this is an API request
         if self.request.path.startswith('/api/'):
@@ -616,23 +691,27 @@ class HabilidadListView(generic.ListView):
             return JsonResponse(habilidades, safe=False)
         return super().render_to_response(context, **response_kwargs)
 
+
 class HabilidadDetailView(generic.DetailView):
     model = Habilidad
     template_name = 'pokedex/habilidad_detail.html'
     context_object_name = 'habilidad'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         habilidad = self.get_object()
-        context['pokemons'] = PokemonHabilidad.objects.filter(habilidad=habilidad)
-        context['descripcion'] = habilidad.Descripcion  # Añadir el campo de descripción para poder mostrarlo en texto negro
+        context['pokemons'] = PokemonHabilidad.objects.filter(
+            habilidad=habilidad)
+        # Añadir el campo de descripción para poder mostrarlo en texto negro
+        context['descripcion'] = habilidad.Descripcion
         return context
+
 
 class HabilidadCreateView(generic.CreateView):
     model = Habilidad
     form_class = HabilidadForm
     template_name = 'pokedex/habilidad_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -649,13 +728,13 @@ class HabilidadCreateView(generic.CreateView):
                     "Descripcion": "Aumenta el consumo de PP del oponente."
                 }
             }, json_dumps_params={'indent': 4})
-            
+
             # Añadir encabezados para una mejor presentación
             response['Content-Type'] = 'application/json'
             return response
-            
+
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -663,26 +742,29 @@ class HabilidadCreateView(generic.CreateView):
                 data = json.loads(request.body)
                 habilidad = Habilidad.objects.create(**data)
                 return JsonResponse({
-                    'id': habilidad.id, 
+                    'id': habilidad.id,
                     'message': 'Habilidad created successfully'
                 }, status=201)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
         return super().post(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Habilidad {self.object.Nombre_Habilidad} ha sido creada exitosamente!')
+        messages.success(
+    self.request,
+     f'Habilidad {self.object.Nombre_Habilidad} ha sido creada exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('habilidad_detail', kwargs={'pk': self.object.id})
+
 
 class HabilidadUpdateView(generic.UpdateView):
     model = Habilidad
     form_class = HabilidadForm
     template_name = 'pokedex/habilidad_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -695,15 +777,16 @@ class HabilidadUpdateView(generic.UpdateView):
                     # Add other fields as needed
                 })
             except Habilidad.DoesNotExist:
-                return JsonResponse({'error': 'Habilidad not found'}, status=404)
+                return JsonResponse(
+                    {'error': 'Habilidad not found'}, status=404)
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests with POST for updates (for compatibility)
         if request.path.startswith('/api/'):
             return self.put(request, *args, **kwargs)
         return super().post(request, *args, **kwargs)
-    
+
     def put(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -714,20 +797,26 @@ class HabilidadUpdateView(generic.UpdateView):
                     if key != 'id':
                         setattr(habilidad, key, value)
                 habilidad.save()
-                return JsonResponse({'message': 'Habilidad updated successfully'})
+                return JsonResponse(
+                    {'message': 'Habilidad updated successfully'})
             except Habilidad.DoesNotExist:
-                return JsonResponse({'error': 'Habilidad not found'}, status=404)
+                return JsonResponse(
+                    {'error': 'Habilidad not found'}, status=404)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
-        return super().put(request, *args, **kwargs) if hasattr(super(), 'put') else HttpResponse(status=405)
-    
+        return super().put(request, *args, **kwargs) if hasattr(super(),
+                     'put') else HttpResponse(status=405)
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Habilidad {self.object.nombre} ha sido actualizada exitosamente!')
+        messages.success(
+    self.request,
+     f'Habilidad {self.object.nombre} ha sido actualizada exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('habilidad_detail', kwargs={'pk': self.object.id})
+
 
 class HabilidadDeleteView(generic.DeleteView):
     model = Habilidad
@@ -735,11 +824,13 @@ class HabilidadDeleteView(generic.DeleteView):
     success_url = reverse_lazy('habilidad_list')
 
 # Class-based views for Tipo
+
+
 class TipoListView(generic.ListView):
     model = Tipo
     template_name = 'pokedex/tipo_list.html'
     context_object_name = 'tipos'
-    
+
     def render_to_response(self, context, **response_kwargs):
         # Check if this is an API request
         if self.request.path.startswith('/api/'):
@@ -747,11 +838,12 @@ class TipoListView(generic.ListView):
             return JsonResponse(tipos, safe=False)
         return super().render_to_response(context, **response_kwargs)
 
+
 class TipoDetailView(generic.DetailView):
     model = Tipo
     template_name = 'pokedex/tipo_detail.html'
     context_object_name = 'tipo'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tipo = self.get_object()
@@ -759,11 +851,12 @@ class TipoDetailView(generic.DetailView):
         # Remove reference to non-existent Descripcion field
         return context
 
+
 class TipoCreateView(generic.CreateView):
     model = Tipo
     form_class = TipoForm
     template_name = 'pokedex/tipo_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -780,13 +873,13 @@ class TipoCreateView(generic.CreateView):
                     "Color": "#FF4500"
                 }
             }, json_dumps_params={'indent': 4})
-            
+
             # Añadir encabezados para una mejor presentación
             response['Content-Type'] = 'application/json'
             return response
-            
+
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -794,26 +887,29 @@ class TipoCreateView(generic.CreateView):
                 data = json.loads(request.body)
                 tipo = Tipo.objects.create(**data)
                 return JsonResponse({
-                    'id': tipo.id, 
+                    'id': tipo.id,
                     'message': 'Tipo created successfully'
                 }, status=201)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
         return super().post(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Tipo {self.object.Nombre_Tipo} ha sido creado exitosamente!')
+        messages.success(
+    self.request,
+     f'Tipo {self.object.Nombre_Tipo} ha sido creado exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('tipo_detail', kwargs={'pk': self.object.id})
+
 
 class TipoUpdateView(generic.UpdateView):
     model = Tipo
     form_class = TipoForm
     template_name = 'pokedex/tipo_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -828,13 +924,13 @@ class TipoUpdateView(generic.UpdateView):
             except Tipo.DoesNotExist:
                 return JsonResponse({'error': 'Tipo not found'}, status=404)
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests with POST for updates (for compatibility)
         if request.path.startswith('/api/'):
             return self.put(request, *args, **kwargs)
         return super().post(request, *args, **kwargs)
-    
+
     def put(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -850,15 +946,19 @@ class TipoUpdateView(generic.UpdateView):
                 return JsonResponse({'error': 'Tipo not found'}, status=404)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
-        return super().put(request, *args, **kwargs) if hasattr(super(), 'put') else HttpResponse(status=405)
-        
+        return super().put(request, *args, **kwargs) if hasattr(super(),
+                     'put') else HttpResponse(status=405)
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Tipo {self.object.Nombre_Tipo} ha sido actualizado exitosamente!')
+        messages.success(
+    self.request,
+     f'Tipo {self.object.Nombre_Tipo} ha sido actualizado exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('tipo_detail', kwargs={'pk': self.object.id})
+
 
 class TipoDeleteView(generic.DeleteView):
     model = Tipo
@@ -866,11 +966,13 @@ class TipoDeleteView(generic.DeleteView):
     success_url = reverse_lazy('tipo_list')
 
 # Class-based views for Categoria
+
+
 class CategoriaListView(generic.ListView):
     model = Categoria
     template_name = 'pokedex/categoria_list.html'
     context_object_name = 'categorias'
-    
+
     def render_to_response(self, context, **response_kwargs):
         # Check if this is an API request
         if self.request.path.startswith('/api/'):
@@ -878,23 +980,26 @@ class CategoriaListView(generic.ListView):
             return JsonResponse(categorias, safe=False)
         return super().render_to_response(context, **response_kwargs)
 
+
 class CategoriaDetailView(generic.DetailView):
     model = Categoria
     template_name = 'pokedex/categoria_detail.html'
     context_object_name = 'categoria'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         categoria = self.get_object()
-        context['pokemons'] = PokemonCategoria.objects.filter(categoria=categoria)
-        context['descripcion'] = categoria.Descripcion  # Añadir el campo de descripción para poder mostrarlo en texto negro
+        context['pokemons'] = PokemonCategoria.objects.filter(
+            categoria=categoria)
+        # Removed reference to non-existent Descripcion field
         return context
+
 
 class CategoriaCreateView(generic.CreateView):
     model = Categoria
     form_class = CategoriaForm
     template_name = 'pokedex/categoria_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -909,13 +1014,13 @@ class CategoriaCreateView(generic.CreateView):
                     "Nombre_Categoria": "Legendario"
                 }
             }, json_dumps_params={'indent': 4})
-            
+
             # Añadir encabezados para una mejor presentación
             response['Content-Type'] = 'application/json'
             return response
-            
+
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -923,45 +1028,59 @@ class CategoriaCreateView(generic.CreateView):
                 data = json.loads(request.body)
                 categoria = Categoria.objects.create(**data)
                 return JsonResponse({
-                    'id': categoria.id, 
+                    'id': categoria.id,
                     'message': 'Categoria created successfully'
                 }, status=201)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
         return super().post(request, *args, **kwargs)
-    
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Categoría {self.object.nombre} ha sido creada exitosamente!')
+        messages.success(
+    self.request,
+     f'Categoría {self.object.nombre} ha sido creada exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('categoria_detail', kwargs={'pk': self.object.id})
+
 
 class CategoriaUpdateView(generic.UpdateView):
     model = Categoria
     form_class = CategoriaForm
     template_name = 'pokedex/categoria_form.html'
-    
+
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Categoría {self.object.nombre} ha sido actualizada exitosamente!')
+        messages.success(
+    self.request,
+     f'Categoría {self.object.nombre} ha sido actualizada exitosamente!')
         return response
-    
+
     def get_success_url(self):
         return reverse_lazy('categoria_detail', kwargs={'pk': self.object.id})
+
 
 class CategoriaDeleteView(generic.DeleteView):
     model = Categoria
     template_name = 'pokedex/categoria_confirm_delete.html'
     success_url = reverse_lazy('categoria_list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categoria = self.get_object()
+        context['pokemons'] = categoria.pokemon.all()
+        return context
+
 # Class-based views for Generacion
+
+
 class GeneracionListView(generic.ListView):
     model = Generacion
     template_name = 'pokedex/generacion_list.html'
     context_object_name = 'generaciones'
-    
+
     def render_to_response(self, context, **response_kwargs):
         # Check if this is an API request
         if self.request.path.startswith('/api/'):
@@ -969,23 +1088,27 @@ class GeneracionListView(generic.ListView):
             return JsonResponse(generaciones, safe=False)
         return super().render_to_response(context, **response_kwargs)
 
+
 class GeneracionDetailView(generic.DetailView):
     model = Generacion
     template_name = 'pokedex/generacion_detail.html'
     context_object_name = 'generacion'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         generacion = self.get_object()
-        context['pokemons'] = PokemonGeneracion.objects.filter(generacion=generacion)
-        context['descripcion'] = generacion.Descripcion  # Añadir el campo de descripción para poder mostrarlo en texto negro
+        context['pokemons'] = PokemonGeneracion.objects.filter(
+            generacion=generacion)
+        # La clase Generacion no tiene un atributo Descripcion
+        # context['descripcion'] = generacion.Descripcion
         return context
+
 
 class GeneracionCreateView(generic.CreateView):
     model = Generacion
     form_class = GeneracionForm
     template_name = 'pokedex/generacion_form.html'
-    
+
     def get(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -1002,13 +1125,13 @@ class GeneracionCreateView(generic.CreateView):
                     "Numero": 1
                 }
             }, json_dumps_params={'indent': 4})
-            
+
             # Añadir encabezados para una mejor presentación
             response['Content-Type'] = 'application/json'
             return response
-            
+
         return super().get(request, *args, **kwargs)
-    
+
     def post(self, request, *args, **kwargs):
         # Handle API requests
         if request.path.startswith('/api/'):
@@ -1016,7 +1139,7 @@ class GeneracionCreateView(generic.CreateView):
                 data = json.loads(request.body)
                 generacion = Generacion.objects.create(**data)
                 return JsonResponse({
-                    'id': generacion.id, 
+                    'id': generacion.id,
                     'message': 'Generacion created successfully'
                 }, status=201)
             except Exception as e:
@@ -1025,7 +1148,7 @@ class GeneracionCreateView(generic.CreateView):
     
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Generación {self.object.nombre} ha sido creada exitosamente!')
+        messages.success(self.request, f'Generación {self.object.Juegos} ha sido creada exitosamente!')
         return response
     
     def get_success_url(self):
@@ -1038,7 +1161,7 @@ class GeneracionUpdateView(generic.UpdateView):
     
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Generación {self.object.nombre} ha sido actualizada exitosamente!')
+        messages.success(self.request, f'Generación {self.object.Juegos} ha sido actualizada exitosamente!')
         return response
     
     def get_success_url(self):
@@ -1071,7 +1194,8 @@ class GrupoHuevoDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         grupo_huevo = self.get_object()
         context['pokemons'] = PokemonGrupoHuevo.objects.filter(grupo_huevo=grupo_huevo)
-        context['descripcion'] = grupo_huevo.Descripcion  # Añadir el campo de descripción para poder mostrarlo en texto negro
+        # La clase Grupo_Huevo no tiene un atributo Descripcion
+        # context['descripcion'] = grupo_huevo.Descripcion
         return context
 
 class GrupoHuevoCreateView(generic.CreateView):
@@ -1116,7 +1240,7 @@ class GrupoHuevoCreateView(generic.CreateView):
     
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Grupo Huevo {self.object.nombre} ha sido creado exitosamente!')
+        messages.success(self.request, f'Grupo Huevo {self.object.nombre_huevo} ha sido creado exitosamente!')
         return response
     
     def get_success_url(self):
@@ -1129,7 +1253,7 @@ class GrupoHuevoUpdateView(generic.UpdateView):
     
     def form_valid(self, form):
         response = super().form_valid(form)
-        messages.success(self.request, f'Grupo Huevo {self.object.nombre} ha sido actualizado exitosamente!')
+        messages.success(self.request, f'Grupo Huevo {self.object.nombre_huevo} ha sido actualizado exitosamente!')
         return response
     
     def get_success_url(self):
@@ -1323,6 +1447,7 @@ class PokemonCategoriaUpdateView(generic.UpdateView):
 class PokemonCategoriaDeleteView(generic.DeleteView):
     model = PokemonCategoria
     template_name = 'pokedex/pokemon_categoria_confirm_delete.html'
+    success_url = reverse_lazy('pokemon_categoria_list')
     success_url = reverse_lazy('pokemon_categoria_list')
 
 # PokemonGeneracion views

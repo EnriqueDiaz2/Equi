@@ -1,0 +1,31 @@
+{% extends 'pokedex/base.html' %}
+{% load static %}
+
+{% block title %}Confirmar eliminación{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Confirmar eliminación</h1>
+            
+            <p class="text-gray-600 mb-6">
+                ¿Estás seguro de que deseas eliminar la relación entre el Pokémon <strong>{{ object.pokemon.Nombre }}</strong> 
+                y la categoría <strong>{{ object.categoria.Nombre_Categoria }}</strong>?
+            </p>
+            
+            <form method="post" class="mt-8">
+                {% csrf_token %}
+                <div class="flex justify-between">
+                    <a href="{% url 'pokemon_detail' object.pokemon.No_Pokemon %}" class="text-gray-500 hover:text-gray-700">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Confirmar eliminación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

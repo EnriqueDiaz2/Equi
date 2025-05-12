@@ -55,8 +55,7 @@
                     
                     <form method="post" class="space-y-6" hx-boost="true">
                         {% csrf_token %}
-                        
-                        <!-- Nombre_Categoria field -->
+                          <!-- Nombre_Categoria field -->
                         <div>
                             <label for="{{ form.Nombre_Categoria.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Categoría</label>
                             {{ form.Nombre_Categoria|add_class:"w-full rounded-md border-gray-300 shadow-sm focus:border-pokemon-red focus:ring focus:ring-pokemon-red focus:ring-opacity-50" }}
@@ -66,15 +65,7 @@
                             <p class="mt-1 text-xs text-gray-500">Por ejemplo: Legendario, Mítico, Normal, etc.</p>
                         </div>
                         
-                        <!-- Descripcion field -->
-                        <div>
-                            <label for="{{ form.Descripcion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                            {{ form.Descripcion|add_class:"w-full rounded-md border-gray-300 shadow-sm focus:border-pokemon-red focus:ring focus:ring-pokemon-red focus:ring-opacity-50" }}
-                            {% if form.Descripcion.errors %}
-                                <p class="mt-2 text-sm text-red-600">{{ form.Descripcion.errors.0 }}</p>
-                            {% endif %}
-                            <p class="mt-1 text-xs text-gray-500">Descripción de la categoría (opcional)</p>
-                        </div>
+                        <!-- Removed Descripcion field as it doesn't exist in the model -->
                         
                         <!-- Submit/Cancel buttons -->
                         <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
