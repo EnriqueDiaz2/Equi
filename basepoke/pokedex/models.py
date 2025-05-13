@@ -14,6 +14,96 @@ class Pokemon(models.Model):
     
     def get_tipos(self):
         return self.tipos.all()
+    
+    def calculate_type_effectiveness(self):
+        """
+        Calculate the effectiveness of all types against this Pokémon based on its type(s).
+        Returns a dictionary with effectiveness values: 0, 0.25, 0.5, 1, 2, or 4
+        """
+        # Diccionario de efectividades de tipo
+        # La clave es el tipo atacante, el valor es una lista de tipos contra los
+        # que es superefectivo (x2)
+        type_chart = {
+            'Normal': [],
+            'Fuego': ['Planta', 'Hielo', 'Bicho', 'Acero'],
+            'Agua': ['Fuego', 'Tierra', 'Roca'],
+            'Eléctrico': ['Agua', 'Volador'],
+            'Planta': ['Agua', 'Tierra', 'Roca'],
+            'Hielo': ['Planta', 'Tierra', 'Volador', 'Dragón'],
+            'Lucha': ['Normal', 'Hielo', 'Roca', 'Siniestro', 'Acero'],
+            'Veneno': ['Planta', 'Hada'],
+            'Tierra': ['Fuego', 'Eléctrico', 'Veneno', 'Roca', 'Acero'],
+            'Volador': ['Planta', 'Lucha', 'Bicho'],
+            'Psíquico': ['Lucha', 'Veneno'],
+            'Bicho': ['Planta', 'Psíquico', 'Siniestro'],
+            'Roca': ['Fuego', 'Hielo', 'Volador', 'Bicho'],
+            'Fantasma': ['Psíquico', 'Fantasma'],
+            'Dragón': ['Dragón'],
+            'Siniestro': ['Psíquico', 'Fantasma'],
+            'Acero': ['Hielo', 'Roca', 'Hada'],
+            'Hada': ['Lucha', 'Dragón', 'Siniestro']
+        }
+        
+        # Inmunidades: tipo atacante como clave, tipos inmunes como valores
+        immunities = {
+            'Normal': ['Fantasma'],
+            'Eléctrico': ['Tierra'],
+            'Lucha': ['Fantasma'],
+            'Veneno': ['Acero'],
+            'Tierra': ['Volador'],
+            'Psíquico': ['Siniestro'],
+            'Fantasma': ['Normal'],
+            'Dragón': ['Hada']
+        }
+        
+        # Resistencias: tipo atacante como clave, tipos que resisten como valores
+        resistances = {
+            'Normal': ['Roca', 'Acero'],
+            'Fuego': ['Fuego', 'Agua', 'Roca', 'Dragón'],
+            'Agua': ['Agua', 'Planta', 'Dragón'],
+            'Eléctrico': ['Eléctrico', 'Planta', 'Dragón'],
+            'Planta': ['Fuego', 'Planta', 'Veneno', 'Volador', 'Bicho', 'Dragón', 'Acero'],
+            'Hielo': ['Fuego', 'Agua', 'Hielo', 'Acero'],
+            'Lucha': ['Veneno', 'Volador', 'Psíquico', 'Bicho', 'Hada'],
+            'Veneno': ['Veneno', 'Tierra', 'Roca', 'Fantasma'],
+            'Tierra': ['Planta', 'Bicho'],
+            'Volador': ['Eléctrico', 'Roca', 'Acero'],
+            'Psíquico': ['Psíquico', 'Acero'],
+            'Bicho': ['Fuego', 'Lucha', 'Veneno', 'Volador', 'Fantasma', 'Acero', 'Hada'],
+            'Roca': ['Lucha', 'Tierra', 'Acero'],
+            'Fantasma': ['Siniestro'],
+            'Dragón': ['Acero'],
+            'Siniestro': ['Lucha', 'Siniestro', 'Hada'],
+            'Acero': ['Fuego', 'Agua', 'Eléctrico', 'Acero'],
+            'Hada': ['Fuego', 'Veneno', 'Acero']
+        }
+        
+        # Obtener los tipos del Pokémon
+        pokemon_types = [pt.tipo.Nombre_Tipo for pt in self.get_tipos()]
+        
+        # Inicializar el diccionario de efectividades con valor 1 (daño normal)
+        effectiveness = {tipo: 1.0 for tipo in type_chart.keys()}
+        
+        # Calcular la efectividad para cada tipo
+        for attacking_type, super_effective_against in type_chart.items():
+            # Revisar si alguno de los tipos del Pokémon es inmune al tipo atacante
+            if attacking_type in immunities and any(pt in immunities[attacking_type] for pt in pokemon_types):
+                effectiveness[attacking_type] = 0
+                continue
+                
+            # Calcular multiplicador de daño basado en resistencias y debilidades
+            multiplier = 1.0
+            for pokemon_type in pokemon_types:
+                # Super efectivo (x2)
+                if pokemon_type in super_effective_against:
+                    multiplier *= 2
+                # Resistencia (x0.5)
+                if attacking_type in resistances and pokemon_type in resistances[attacking_type]:
+                    multiplier *= 0.5
+                    
+            effectiveness[attacking_type] = multiplier
+            
+        return effectiveness
         
     class Meta:
         verbose_name = "Pokémon"
@@ -28,6 +118,7 @@ class Movimiento(models.Model):
         ('Especial', 'Especial'),
         ('Estado', 'Estado'),
     ])
+    Descripcion = models.TextField(blank=True, null=True)
     Puntos_Uso = models.IntegerField()
     
     def __str__(self):
@@ -90,6 +181,17 @@ class Grupo_Huevo(models.Model):
     class Meta:
         verbose_name = "Grupo Huevo"
         verbose_name_plural = "Grupos Huevo"
+
+class Debilidad(models.Model):
+    pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name='debilidades')
+    tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE, related_name='debilidades')
+
+    def __str__(self):
+        return f"{self.pokemon.Nombre} - {self.tipo.Nombre_Tipo}"
+
+    class Meta:
+        verbose_name = "Debilidad"
+        verbose_name_plural = "Debilidades"
 
 # Creating relationship models for many-to-many relationships
 class PokemonTipo(models.Model):

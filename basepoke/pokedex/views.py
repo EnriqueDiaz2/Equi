@@ -442,6 +442,12 @@ class PokemonDetailView(generic.DetailView):
         context['tipos'] = PokemonTipo.objects.filter(
     pokemon=pokemon).select_related('tipo').order_by('id')
 
+        # Calculate type effectiveness
+        context['type_effectiveness'] = pokemon.calculate_type_effectiveness()
+        
+        # Get all available types for the effectiveness chart
+        context['all_types'] = Tipo.objects.all().order_by('Nombre_Tipo')
+
         # Get other related data
         context['habilidades'] = PokemonHabilidad.objects.filter(
             pokemon=pokemon)
