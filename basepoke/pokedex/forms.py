@@ -3,7 +3,7 @@ from .models import (
     Pokemon, Movimiento, Habilidad, Tipo, Categoria, 
     Generacion, Grupo_Huevo, PokemonTipo, PokemonHabilidad, 
     PokemonMovimiento, PokemonCategoria, PokemonGeneracion, 
-    PokemonGrupoHuevo, Naturaleza, Puntos_Base
+    PokemonGrupoHuevo, Naturaleza, Puntos_Base, Evolucion
 )
 
 # Common CSS classes for form styling
@@ -170,4 +170,16 @@ class PuntosBaseForm(forms.ModelForm):
             'Ataque_Especial': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Ataque Especial base'}),
             'Defensa_Especial': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Defensa Especial base'}),
             'Velocidad': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Velocidad base'}),
+        }
+
+# Evolucion Form
+class EvolucionForm(forms.ModelForm):
+    class Meta:
+        model = Evolucion
+        fields = ['pokemon', 'pokemon_evolucion', 'metodo_evolucion', 'nivel_evolucion']
+        widgets = {
+            'pokemon': forms.Select(attrs={'class': select_class}),
+            'pokemon_evolucion': forms.Select(attrs={'class': select_class}),
+            'metodo_evolucion': forms.TextInput(attrs={'class': input_class, 'placeholder': 'Método de evolución'}),
+            'nivel_evolucion': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Nivel de evolución (opcional)'}),
         }

@@ -1,0 +1,85 @@
+{% extends 'pokedex/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.id %}Editar{% else %}Nueva{% endif %} Evolución - Pokédex{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">{% if form.instance.id %}Editar{% else %}Nueva{% endif %} Evolución</h1>
+    </div>
+
+    {% if messages %}
+    <div class="mb-6">
+        {% for message in messages %}
+        <div class="p-4 mb-4 {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %} rounded">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Pokemon Original -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ form.pokemon.id_for_label }}">
+                        Pokémon Original
+                    </label>
+                    {{ form.pokemon }}
+                    {% if form.pokemon.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ form.pokemon.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Pokemon Evolucionado -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ form.pokemon_evolucion.id_for_label }}">
+                        Pokémon Evolucionado
+                    </label>
+                    {{ form.pokemon_evolucion }}
+                    {% if form.pokemon_evolucion.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ form.pokemon_evolucion.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Método de Evolución -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ form.metodo_evolucion.id_for_label }}">
+                        Método de Evolución
+                    </label>
+                    {{ form.metodo_evolucion }}
+                    {% if form.metodo_evolucion.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ form.metodo_evolucion.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Nivel de Evolución -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="{{ form.nivel_evolucion.id_for_label }}">
+                        Nivel de Evolución (opcional)
+                    </label>
+                    {{ form.nivel_evolucion }}
+                    {% if form.nivel_evolucion.errors %}
+                        <p class="text-red-500 text-xs italic mt-1">{{ form.nivel_evolucion.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mt-6">
+                <button class="bg-pokemon-red hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    {% if form.instance.id %}Actualizar{% else %}Guardar{% endif %}
+                </button>
+                <a href="{% url 'evolucion_list' %}" class="inline-block align-baseline font-bold text-sm text-pokemon-red hover:text-red-800">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

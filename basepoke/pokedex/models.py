@@ -110,6 +110,19 @@ class Pokemon(models.Model):
         verbose_name = "Pokémon"
         verbose_name_plural = "Pokémon"
 
+class Evolucion(models.Model):
+    pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name='evoluciones')
+    pokemon_evolucion = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name='evolucion_de')
+    metodo_evolucion = models.CharField(max_length=100)
+    nivel_evolucion = models.IntegerField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.pokemon.Nombre} evoluciona a {self.pokemon_evolucion.Nombre} ({self.metodo_evolucion})"
+    
+    class Meta:
+        verbose_name = "Evolución"
+        verbose_name_plural = "Evoluciones"
+        
 class Puntos_Base(models.Model):
     pokemon = models.OneToOneField(Pokemon, on_delete=models.CASCADE, related_name='puntos_base')
     HP = models.IntegerField()

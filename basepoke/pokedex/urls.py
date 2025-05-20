@@ -116,6 +116,13 @@ urlpatterns = [
     path('pokemon-grupos-huevo/<int:pk>/edit/', views.PokemonGrupoHuevoUpdateView.as_view(), name='pokemon_grupo_huevo_update'),
     path('pokemon-grupos-huevo/<int:pk>/delete/', views.PokemonGrupoHuevoDeleteView.as_view(), name='pokemon_grupo_huevo_delete'),
     
+    # Evolucion URLs
+    path('evoluciones/', views.EvolucionListView.as_view(), name='evolucion_list'),
+    path('evoluciones/<int:pk>/', views.EvolucionDetailView.as_view(), name='evolucion_detail'),
+    path('evoluciones/new/', views.EvolucionCreateView.as_view(), name='evolucion_create'),
+    path('evoluciones/<int:pk>/edit/', views.EvolucionUpdateView.as_view(), name='evolucion_update'),
+    path('evoluciones/<int:pk>/delete/', views.EvolucionDeleteView.as_view(), name='evolucion_delete'),
+    
     # HTMX endpoints
     path('preview-image/', views.preview_image, name='preview_image'),
     path('pokemon/<int:no_pokemon>/favorite/', views.pokemon_favorite, name='pokemon_favorite'),

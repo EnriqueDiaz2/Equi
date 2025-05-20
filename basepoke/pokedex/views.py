@@ -5,7 +5,7 @@ from .models import (
     Pokemon, Movimiento, Habilidad, Tipo, Categoria,
     Generacion, Grupo_Huevo, PokemonTipo, PokemonHabilidad,
     PokemonMovimiento, PokemonCategoria, PokemonGeneracion,
-    PokemonGrupoHuevo, Naturaleza, Puntos_Base
+    PokemonGrupoHuevo, Naturaleza, Puntos_Base, Evolucion
 )
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -16,7 +16,7 @@ from .forms import (
     CategoriaForm, GeneracionForm, GrupoHuevoForm, PokemonTipoForm,
     PokemonHabilidadForm, PokemonMovimientoForm, PokemonCategoriaForm,
     PokemonGeneracionForm, PokemonGrupoHuevoForm, NaturalezaForm,
-    PuntosBaseForm
+    PuntosBaseForm, EvolucionForm
 )
 from django.template.loader import render_to_string
 
@@ -1649,6 +1649,65 @@ class PokemonGrupoHuevoDeleteView(generic.DeleteView):
     template_name = 'pokedex/pokemon_grupo_huevo_confirm_delete.html'
     success_url = reverse_lazy('pokemon_grupo_huevo_list')
 
+# Class-based views for Evolucion
+class EvolucionListView(generic.ListView):
+    model = Evolucion
+    template_name = 'pokedex/evolucion_list.html'
+    context_object_name = 'evoluciones'
+
+
+class EvolucionDetailView(generic.DetailView):
+    model = Evolucion
+    template_name = 'pokedex/evolucion_detail.html'
+    context_object_name = 'evolucion'
+
+
+class EvolucionCreateView(generic.CreateView):
+    model = Evolucion
+    form_class = EvolucionForm
+    template_name = 'pokedex/evolucion_form.html'
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        pokemon = form.cleaned_data["pokemon"]
+        pokemon_evolucion = form.cleaned_data["pokemon_evolucion"]
+        messages.success(self.request, f'Evolución de {pokemon.Nombre} a {pokemon_evolucion.Nombre} ha sido creada exitosamente!')
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy('evolucion_detail', kwargs={'pk': self.object.id})
+
+
+class EvolucionUpdateView(generic.UpdateView):
+    model = Evolucion
+    form_class = EvolucionForm
+    template_name = 'pokedex/evolucion_form.html'
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        pokemon = form.cleaned_data["pokemon"]
+        pokemon_evolucion = form.cleaned_data["pokemon_evolucion"]
+        messages.success(self.request, f'Evolución de {pokemon.Nombre} a {pokemon_evolucion.Nombre} ha sido actualizada exitosamente!')
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy('evolucion_detail', kwargs={'pk': self.object.id})
+
+
+class EvolucionDeleteView(generic.DeleteView):
+    model = Evolucion
+    template_name = 'pokedex/evolucion_confirm_delete.html'
+    success_url = reverse_lazy('evolucion_list')
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        pokemon = self.object.pokemon
+        pokemon_evolucion = self.object.pokemon_evolucion
+        success_url = self.get_success_url()
+        self.object.delete()
+        messages.success(request, f'Evolución de {pokemon.Nombre} a {pokemon_evolucion.Nombre} ha sido eliminada correctamente.')
+        return redirect(success_url)
+
 # Additional HTMX views
 @csrf_exempt
 def preview_image(request):
@@ -1683,6 +1742,7 @@ def index(request):
             'categoria_count': Categoria.objects.count(),
             'generacion_count': Generacion.objects.count(),
             'grupo_huevo_count': Grupo_Huevo.objects.count(),
+            'evolucion_count': Evolucion.objects.count(),
         }
     except Exception as e:
         # Handle the case when tables don't exist yet

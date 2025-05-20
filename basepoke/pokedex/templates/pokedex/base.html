@@ -258,8 +258,9 @@
                                  x-transition:leave="transition ease-in duration-75" 
                                  x-transition:leave-start="transform opacity-100 scale-100" 
                                  x-transition:leave-end="transform opacity-0 scale-95" 
-                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-                                <div class="py-1">
+                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">                                <div class="py-1">
+                                    <a href="{% url 'naturaleza_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Naturalezas</a>
+                                    <a href="{% url 'evolucion_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Evoluciones</a>
                                     <a href="{% url 'categoria_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Categorías</a>
                                     <a href="{% url 'generacion_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Generaciones</a>
                                     <a href="{% url 'grupo_huevo_list' %}" class="block px-4 py-2 text-gray-700 hover:bg-red-100 hover:text-red-800">Grupos Huevo</a>
@@ -305,6 +306,18 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                         </svg>
                         Tipos
+                    </a>
+                    <a href="{% url 'naturaleza_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        Naturalezas
+                    </a>
+                    <a href="{% url 'evolucion_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                        </svg>
+                        Evoluciones
                     </a>
                     <a href="{% url 'categoria_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">Categorías</a>
                     <a href="{% url 'generacion_list' %}" class="flex items-center px-3 py-2 hover:bg-red-700 rounded">Generaciones</a>
