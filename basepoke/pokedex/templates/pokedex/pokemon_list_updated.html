@@ -121,15 +121,28 @@
                     const pokemonName = card.getAttribute('data-name').toLowerCase();
                     const pokemonNumber = card.getAttribute('data-number');
                     const types = card.getAttribute('data-types').toLowerCase();
-                      // Check for exact number match or name match (case insensitive)
-                    const searchTerm = this.searchTerm.toLowerCase().trim();
-                    const exactNumberMatch = pokemonNumber === searchTerm;
-                    const nameMatch = pokemonName.includes(searchTerm);
                     
-                    // If search term is a number, prioritize exact number match
-                    const isNumericSearch = /^\d+$/.test(searchTerm);
-                    const matchesSearch = exactNumberMatch || nameMatch || 
-                                          (isNumericSearch && pokemonNumber.startsWith(searchTerm));
+                    // Advanced search logic for both number and name
+                    const searchTerm = this.searchTerm.toLowerCase().trim();
+                    
+                    let matchesSearch = false;
+                    
+                    // If the search is empty, show all
+                    if (searchTerm === '') {
+                        matchesSearch = true;
+                    } 
+                    // Check if it's an exact number match
+                    else if (pokemonNumber === searchTerm) {
+                        matchesSearch = true;
+                    }
+                    // Check if it's a partial number match (starts with)
+                    else if (/^\d+$/.test(searchTerm) && pokemonNumber.startsWith(searchTerm)) {
+                        matchesSearch = true;
+                    }
+                    // Check if it's a name match (contains)
+                    else if (pokemonName.includes(searchTerm)) {
+                        matchesSearch = true;
+                    }
                     
                     const matchesType = this.typeFilter === 'all' || 
                                          types.includes(this.typeFilter.toLowerCase());
@@ -189,16 +202,19 @@
         <!-- Filters and Search -->
         <div class="bg-white rounded-xl shadow-md p-4 mb-8">
             <div class="flex flex-col md:flex-row gap-4">
-                <div class="relative flex-grow">                    <input 
+                <div class="relative flex-grow">
+                    <input 
                         type="text" 
-                        placeholder="Buscar por nombre o número exacto..."                        aria-label="Buscar Pokémon"
+                        placeholder="Buscar por nombre o número exacto..." 
+                        aria-label="Buscar Pokémon"
                         class="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-pokemon-red focus:border-pokemon-red search-input"
                         x-model="searchTerm"
                         @keyup.enter="filteredPokemon"
                     >
                 </div>
                 
-                <div class="flex gap-4">                    <select 
+                <div class="flex gap-4">
+                    <select 
                         class="rounded-lg border border-gray-300 px-4 py-3 focus:ring-pokemon-red focus:border-pokemon-red"
                         x-model="typeFilter"
                         aria-label="Filtrar por tipo">
@@ -222,7 +238,8 @@
                         <option value="Acero">Acero</option>
                         <option value="Hada">Hada</option>
                     </select>
-                      <select 
+                    
+                    <select 
                         class="rounded-lg border border-gray-300 px-4 py-3 focus:ring-pokemon-red focus:border-pokemon-red"
                         x-model="sortOrder"
                         aria-label="Ordenar Pokémon">
@@ -310,7 +327,8 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-            </div>            <h3 class="text-xl font-medium text-gray-700 mb-1">No se encontraron Pokémon</h3>
+            </div>
+            <h3 class="text-xl font-medium text-gray-700 mb-1">No se encontraron Pokémon</h3>
             <p class="text-gray-500">Si estás buscando por número, asegúrate de ingresar el número exacto<br>o intenta buscar por nombre.</p>
         </div>
         
