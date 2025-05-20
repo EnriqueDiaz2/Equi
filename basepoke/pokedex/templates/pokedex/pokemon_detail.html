@@ -1122,17 +1122,119 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Evolution tab -->
+                          <!-- Evolution tab -->
                         <div x-show="activeTab === 'evolution'" class="animate-fade-in" x-cloak>
                             <div class="bg-gray-50 p-6 rounded-lg mb-6">
-                                <div class="text-center mb-6">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                    <h3 class="text-lg font-medium text-gray-700">Cadena Evolutiva</h3>
-                                    <p class="text-gray-500 text-sm">Funcionalidad en desarrollo...</p>
+                                {% if tiene_evolucion %}
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">Cadena Evolutiva</h3>
+                                
+                                <div class="grid grid-cols-1 gap-4">
+                                    <!-- Pre-evolución (si existe) -->
+                                    {% if evoluciona_de %}
+                                    <div class="rounded-lg bg-white p-4 shadow-sm">
+                                        <h4 class="text-md font-medium text-gray-700 mb-3">Evoluciona de:</h4>
+                                        
+                                        {% for evolucion in evoluciona_de %}
+                                        <div class="flex items-center mb-4">
+                                            <div class="flex items-center flex-grow">
+                                                <div class="flex-shrink-0 h-16 w-16">
+                                                    {% if evolucion.pokemon.Ruta_Imagen %}
+                                                    <img class="h-16 w-16 rounded-full object-cover border-2 border-gray-200" src="{{ evolucion.pokemon.Ruta_Imagen }}" alt="{{ evolucion.pokemon.Nombre }}">
+                                                    {% else %}
+                                                    <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+                                                        <span class="text-gray-500 text-xs">Sin img</span>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="ml-4">
+                                                    <a href="{% url 'pokemon_detail' evolucion.pokemon.No_Pokemon %}" class="text-lg font-medium text-gray-900 hover:text-pokemon-red">
+                                                        {{ evolucion.pokemon.Nombre }}
+                                                    </a>
+                                                    <p class="text-sm text-gray-500">#{{ evolucion.pokemon.No_Pokemon }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col items-end">
+                                                <div class="flex items-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                    </svg>
+                                                    <div class="ml-2">
+                                                        <p class="text-sm font-medium text-gray-700">{{ evolucion.metodo_evolucion }}</p>
+                                                        {% if evolucion.nivel_evolucion %}
+                                                        <p class="text-xs text-gray-500">Nivel {{ evolucion.nivel_evolucion }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Evoluciones (si existen) -->
+                                    {% if evoluciona_a %}
+                                    <div class="rounded-lg bg-white p-4 shadow-sm">
+                                        <h4 class="text-md font-medium text-gray-700 mb-3">Evoluciona a:</h4>
+                                        
+                                        {% for evolucion in evoluciona_a %}
+                                        <div class="flex items-center mb-4">
+                                            <div class="flex flex-col items-start mr-4">
+                                                <div class="flex items-center">
+                                                    <div class="mr-2">
+                                                        <p class="text-sm font-medium text-gray-700">{{ evolucion.metodo_evolucion }}</p>
+                                                        {% if evolucion.nivel_evolucion %}
+                                                        <p class="text-xs text-gray-500">Nivel {{ evolucion.nivel_evolucion }}</p>
+                                                        {% endif %}
+                                                    </div>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center flex-grow">
+                                                <div class="flex-shrink-0 h-16 w-16">
+                                                    {% if evolucion.pokemon_evolucion.Ruta_Imagen %}
+                                                    <img class="h-16 w-16 rounded-full object-cover border-2 border-gray-200" src="{{ evolucion.pokemon_evolucion.Ruta_Imagen }}" alt="{{ evolucion.pokemon_evolucion.Nombre }}">
+                                                    {% else %}
+                                                    <div class="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+                                                        <span class="text-gray-500 text-xs">Sin img</span>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="ml-4">
+                                                    <a href="{% url 'pokemon_detail' evolucion.pokemon_evolucion.No_Pokemon %}" class="text-lg font-medium text-gray-900 hover:text-pokemon-red">
+                                                        {{ evolucion.pokemon_evolucion.Nombre }}
+                                                    </a>
+                                                    <p class="text-sm text-gray-500">#{{ evolucion.pokemon_evolucion.No_Pokemon }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="mt-4 text-center">
+                                        <a href="{% url 'evolucion_list' %}" class="text-pokemon-red hover:text-red-800 text-sm font-medium">Ver todas las evoluciones</a>
+                                    </div>
                                 </div>
+                                {% else %}
+                                <div class="text-center py-8">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <h3 class="text-lg font-medium text-gray-700 mb-1">Sin Evoluciones</h3>
+                                    <p class="text-gray-500 text-sm mb-4">Este Pokémon no evoluciona de otro ni evoluciona a otro Pokémon.</p>
+                                    
+                                    <div class="mt-4">
+                                        <a href="{% url 'evolucion_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pokemon-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pokemon-red">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            </svg>
+                                            Registrar una evolución
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

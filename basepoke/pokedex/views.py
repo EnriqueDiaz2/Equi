@@ -448,7 +448,7 @@ class PokemonDetailView(generic.DetailView):
         
         # Get all available types for the effectiveness chart
         context['all_types'] = Tipo.objects.all().order_by('Nombre_Tipo')
-
+        
         # Get other related data
         context['habilidades'] = PokemonHabilidad.objects.filter(
             pokemon=pokemon)
@@ -471,6 +471,16 @@ class PokemonDetailView(generic.DetailView):
             context['puntos_base'] = None
             context['stats_with_nature'] = None
             context['stat_percentages'] = None
+        
+        # Get evolutionary chain data
+        evoluciona_de = pokemon.evolucion_de.all().select_related('pokemon')
+        evoluciona_a = pokemon.evoluciones.all().select_related('pokemon_evolucion')
+        
+        context['evoluciona_de'] = evoluciona_de
+        context['evoluciona_a'] = evoluciona_a
+        
+        # Check if this Pokémon is part of a larger evolutionary chain
+        context['tiene_evolucion'] = evoluciona_de.exists() or evoluciona_a.exists()
             
         return context
 
