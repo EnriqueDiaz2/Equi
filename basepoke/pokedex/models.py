@@ -8,6 +8,7 @@ class Pokemon(models.Model):
     Descripcion = models.TextField(blank=True, null=True)
     Altura = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     Peso = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    naturaleza = models.ForeignKey('Naturaleza', on_delete=models.SET_NULL, related_name='pokemon', null=True, blank=True)
     
     def __str__(self):
         return f"{self.No_Pokemon} - {self.Nombre}"
@@ -109,6 +110,67 @@ class Pokemon(models.Model):
         verbose_name = "Pokémon"
         verbose_name_plural = "Pokémon"
 
+class Puntos_Base(models.Model):
+    pokemon = models.OneToOneField(Pokemon, on_delete=models.CASCADE, related_name='puntos_base')
+    HP = models.IntegerField()
+    Ataque = models.IntegerField()
+    Defensa = models.IntegerField()
+    Ataque_Especial = models.IntegerField()
+    Defensa_Especial = models.IntegerField()
+    Velocidad = models.IntegerField()
+    
+    def __str__(self):
+        return f"{self.pokemon.Nombre} - Puntos Base"
+        
+    def get_stats_with_nature(self):
+        """
+        Calculate stats considering nature effects
+        Returns a dictionary with the modified stats
+        """
+        stats = {
+            'HP': self.HP,
+            'Ataque': self.Ataque,
+            'Defensa': self.Defensa,
+            'Ataque_Especial': self.Ataque_Especial,
+            'Defensa_Especial': self.Defensa_Especial,
+            'Velocidad': self.Velocidad,
+        }
+        
+        # Apply nature effects if the Pokemon has a nature
+        if self.pokemon.naturaleza:
+            # Stat to increase (10% boost)
+            if self.pokemon.naturaleza.aumenta != 'Ninguna':
+                stats[self.pokemon.naturaleza.aumenta] = int(stats[self.pokemon.naturaleza.aumenta] * 1.1)
+                
+            # Stat to decrease (10% reduction)
+            if self.pokemon.naturaleza.disminuye != 'Ninguna':
+                stats[self.pokemon.naturaleza.disminuye] = int(stats[self.pokemon.naturaleza.disminuye] * 0.9)
+                
+        return stats
+    
+    def get_stat_percentages(self):
+        """
+        Calculate the percentage for each stat for displaying in stat bars
+        Returns a dictionary with percentages
+        """
+        # Average maximum stat values for normalization
+        max_hp = 255
+        max_other = 180
+        
+        stats = self.get_stats_with_nature()
+        
+        return {
+            'HP': min(100, int(stats['HP'] / max_hp * 100)),
+            'Ataque': min(100, int(stats['Ataque'] / max_other * 100)),
+            'Defensa': min(100, int(stats['Defensa'] / max_other * 100)),
+            'Ataque_Especial': min(100, int(stats['Ataque_Especial'] / max_other * 100)),
+            'Defensa_Especial': min(100, int(stats['Defensa_Especial'] / max_other * 100)),
+            'Velocidad': min(100, int(stats['Velocidad'] / max_other * 100)),
+        }
+        
+    class Meta:
+        verbose_name = "Puntos Base"
+        verbose_name_plural = "Puntos Base"
 class Movimiento(models.Model):
     Nombre_Movimiento = models.CharField(max_length=100, unique=True)
     Precision = models.IntegerField()
@@ -181,6 +243,35 @@ class Grupo_Huevo(models.Model):
     class Meta:
         verbose_name = "Grupo Huevo"
         verbose_name_plural = "Grupos Huevo"
+
+class Naturaleza(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
+    aumenta = models.CharField(max_length=20, choices=[
+        ('Ataque', 'Ataque'),
+        ('Defensa', 'Defensa'),
+        ('Ataque_Especial', 'Ataque Especial'),
+        ('Defensa_Especial', 'Defensa Especial'),
+        ('Velocidad', 'Velocidad'),
+        ('Ninguna', 'Ninguna'),
+    ], default='Ninguna')
+    disminuye = models.CharField(max_length=20, choices=[
+        ('Ataque', 'Ataque'),
+        ('Defensa', 'Defensa'),
+        ('Ataque_Especial', 'Ataque Especial'),
+        ('Defensa_Especial', 'Defensa Especial'),
+        ('Velocidad', 'Velocidad'),
+        ('Ninguna', 'Ninguna'),
+    ], default='Ninguna')
+    descripcion = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        if self.aumenta == 'Ninguna' and self.disminuye == 'Ninguna':
+            return f"{self.nombre} (Neutral)"
+        return f"{self.nombre} (+{self.aumenta.replace('_', ' ')}, -{self.disminuye.replace('_', ' ')})"
+    
+    class Meta:
+        verbose_name = "Naturaleza"
+        verbose_name_plural = "Naturalezas"
 
 class Debilidad(models.Model):
     pokemon = models.ForeignKey(Pokemon, on_delete=models.CASCADE, related_name='debilidades')

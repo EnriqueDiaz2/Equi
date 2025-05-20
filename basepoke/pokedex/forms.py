@@ -3,7 +3,7 @@ from .models import (
     Pokemon, Movimiento, Habilidad, Tipo, Categoria, 
     Generacion, Grupo_Huevo, PokemonTipo, PokemonHabilidad, 
     PokemonMovimiento, PokemonCategoria, PokemonGeneracion, 
-    PokemonGrupoHuevo
+    PokemonGrupoHuevo, Naturaleza, Puntos_Base
 )
 
 # Common CSS classes for form styling
@@ -15,7 +15,7 @@ select_class = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:bor
 class PokemonForm(forms.ModelForm):
     class Meta:
         model = Pokemon
-        fields = ['No_Pokemon', 'Nombre', 'Ruta_Imagen', 'Descripcion', 'Altura', 'Peso']
+        fields = ['No_Pokemon', 'Nombre', 'Ruta_Imagen', 'Descripcion', 'Altura', 'Peso', 'naturaleza']
         widgets = {
             'No_Pokemon': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Número de Pokémon'}),
             'Nombre': forms.TextInput(attrs={'class': input_class, 'placeholder': 'Nombre del Pokémon'}),
@@ -23,13 +23,15 @@ class PokemonForm(forms.ModelForm):
             'Descripcion': forms.Textarea(attrs={'class': text_area_class, 'placeholder': 'Descripción', 'rows': 4}),
             'Altura': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Altura en metros', 'step': '0.01'}),
             'Peso': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Peso en kg', 'step': '0.01'}),
+            'naturaleza': forms.Select(attrs={'class': select_class}),
         }
 
 # Movimiento Form
 class MovimientoForm(forms.ModelForm):
     class Meta:
         model = Movimiento
-        fields = ['Nombre_Movimiento', 'Precision', 'Potencia', 'Categoria', 'Puntos_Uso']
+        fields = ['Nombre_Movimiento', 'Precision', 'Potencia', 'Categoria', 'Puntos_Uso'
+        ]
         widgets = {
             'Nombre_Movimiento': forms.TextInput(attrs={'class': input_class, 'placeholder': 'Nombre del movimiento'}),
             'Precision': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Precisión (0-100)'}),
@@ -65,6 +67,18 @@ class CategoriaForm(forms.ModelForm):
         fields = ['Nombre_Categoria']
         widgets = {
             'Nombre_Categoria': forms.TextInput(attrs={'class': input_class, 'placeholder': 'Nombre de la categoría'}),
+        }
+
+# Naturaleza Form
+class NaturalezaForm(forms.ModelForm):
+    class Meta:
+        model = Naturaleza
+        fields = ['nombre', 'aumenta', 'disminuye', 'descripcion']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': input_class, 'placeholder': 'Nombre de la naturaleza'}),
+            'aumenta': forms.Select(attrs={'class': select_class}),
+            'disminuye': forms.Select(attrs={'class': select_class}),
+            'descripcion': forms.Textarea(attrs={'class': text_area_class, 'placeholder': 'Descripción', 'rows': 3}),
         }
 
 # Generacion Form
@@ -141,4 +155,19 @@ class PokemonGrupoHuevoForm(forms.ModelForm):
         widgets = {
             'pokemon': forms.Select(attrs={'class': select_class}),
             'grupo_huevo': forms.Select(attrs={'class': select_class}),
+        }
+
+# PuntosBase Form
+class PuntosBaseForm(forms.ModelForm):
+    class Meta:
+        model = Puntos_Base
+        fields = ['pokemon', 'HP', 'Ataque', 'Defensa', 'Ataque_Especial', 'Defensa_Especial', 'Velocidad']
+        widgets = {
+            'pokemon': forms.Select(attrs={'class': select_class}),
+            'HP': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'HP base'}),
+            'Ataque': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Ataque base'}),
+            'Defensa': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Defensa base'}),
+            'Ataque_Especial': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Ataque Especial base'}),
+            'Defensa_Especial': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Defensa Especial base'}),
+            'Velocidad': forms.NumberInput(attrs={'class': input_class, 'placeholder': 'Velocidad base'}),
         }

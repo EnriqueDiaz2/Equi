@@ -65,6 +65,20 @@ urlpatterns = [
     path('grupos-huevo/<int:pk>/edit/', views.GrupoHuevoUpdateView.as_view(), name='grupo_huevo_update'),
     path('grupos-huevo/<int:pk>/delete/', views.GrupoHuevoDeleteView.as_view(), name='grupo_huevo_delete'),
     
+    # Naturaleza URLs
+    path('naturalezas/', views.NaturalezaListView.as_view(), name='naturaleza_list'),
+    path('naturalezas/<int:pk>/', views.NaturalezaDetailView.as_view(), name='naturaleza_detail'),
+    path('naturalezas/new/', views.NaturalezaCreateView.as_view(), name='naturaleza_create'),
+    path('naturalezas/<int:pk>/edit/', views.NaturalezaUpdateView.as_view(), name='naturaleza_update'),
+    path('naturalezas/<int:pk>/delete/', views.NaturalezaDeleteView.as_view(), name='naturaleza_delete'),
+    
+    # Puntos Base URLs
+    path('puntos-base/', views.PuntosBaseListView.as_view(), name='puntos_base_list'),
+    path('puntos-base/<int:pk>/', views.PuntosBaseDetailView.as_view(), name='puntos_base_detail'),
+    path('puntos-base/new/', views.PuntosBaseCreateView.as_view(), name='puntos_base_create'),
+    path('puntos-base/<int:pk>/edit/', views.PuntosBaseUpdateView.as_view(), name='puntos_base_update'),
+    path('puntos-base/<int:pk>/delete/', views.PuntosBaseDeleteView.as_view(), name='puntos_base_delete'),
+    
     # Relationship model URLs
     # PokemonTipo URLs
     path('pokemon-tipos/', views.PokemonTipoListView.as_view(), name='pokemon_tipo_list'),

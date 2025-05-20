@@ -5,7 +5,7 @@ from .models import (
     Pokemon, Movimiento, Habilidad, Tipo, Categoria,
     Generacion, Grupo_Huevo, PokemonTipo, PokemonHabilidad,
     PokemonMovimiento, PokemonCategoria, PokemonGeneracion,
-    PokemonGrupoHuevo
+    PokemonGrupoHuevo, Naturaleza, Puntos_Base
 )
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -15,7 +15,8 @@ from .forms import (
     PokemonForm, MovimientoForm, HabilidadForm, TipoForm,
     CategoriaForm, GeneracionForm, GrupoHuevoForm, PokemonTipoForm,
     PokemonHabilidadForm, PokemonMovimientoForm, PokemonCategoriaForm,
-    PokemonGeneracionForm, PokemonGrupoHuevoForm
+    PokemonGeneracionForm, PokemonGrupoHuevoForm, NaturalezaForm,
+    PuntosBaseForm
 )
 from django.template.loader import render_to_string
 
@@ -433,7 +434,7 @@ class PokemonDetailView(generic.DetailView):
     template_name = 'pokedex/pokemon_detail.html'
     context_object_name = 'pokemon'
     pk_url_kwarg = 'no_pokemon'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pokemon = self.get_object()
@@ -459,6 +460,18 @@ class PokemonDetailView(generic.DetailView):
             pokemon=pokemon)
         context['grupos_huevo'] = PokemonGrupoHuevo.objects.filter(
             pokemon=pokemon)
+            
+        # Get the stats with nature effects if available
+        try:
+            puntos_base = pokemon.puntos_base
+            context['puntos_base'] = puntos_base
+            context['stats_with_nature'] = puntos_base.get_stats_with_nature()
+            context['stat_percentages'] = puntos_base.get_stat_percentages()
+        except Puntos_Base.DoesNotExist:
+            context['puntos_base'] = None
+            context['stats_with_nature'] = None
+            context['stat_percentages'] = None
+            
         return context
 
 
@@ -1178,6 +1191,54 @@ class GeneracionDeleteView(generic.DeleteView):
     template_name = 'pokedex/generacion_confirm_delete.html'
     success_url = reverse_lazy('generacion_list')
 
+# Class-based views for Naturaleza
+
+
+class NaturalezaListView(generic.ListView):
+    model = Naturaleza
+    template_name = 'pokedex/naturaleza_list.html'
+    context_object_name = 'naturalezas'
+
+
+class NaturalezaDetailView(generic.DetailView):
+    model = Naturaleza
+    template_name = 'pokedex/naturaleza_detail.html'
+    context_object_name = 'naturaleza'
+
+
+class NaturalezaCreateView(generic.CreateView):
+    model = Naturaleza
+    form_class = NaturalezaForm
+    template_name = 'pokedex/naturaleza_form.html'
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Naturaleza {self.object.nombre} ha sido creada exitosamente!')
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy('naturaleza_detail', kwargs={'pk': self.object.id})
+
+
+class NaturalezaUpdateView(generic.UpdateView):
+    model = Naturaleza
+    form_class = NaturalezaForm
+    template_name = 'pokedex/naturaleza_form.html'
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Naturaleza {self.object.nombre} ha sido actualizada exitosamente!')
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy('naturaleza_detail', kwargs={'pk': self.object.id})
+
+
+class NaturalezaDeleteView(generic.DeleteView):
+    model = Naturaleza
+    template_name = 'pokedex/naturaleza_confirm_delete.html'
+    success_url = reverse_lazy('naturaleza_list')
+
 # Class-based views for Grupo_Huevo
 class GrupoHuevoListView(generic.ListView):
     model = Grupo_Huevo
@@ -1269,6 +1330,58 @@ class GrupoHuevoDeleteView(generic.DeleteView):
     model = Grupo_Huevo
     template_name = 'pokedex/grupo_huevo_confirm_delete.html'
     success_url = reverse_lazy('grupo_huevo_list')
+
+# Class-based views for Puntos_Base
+class PuntosBaseListView(generic.ListView):
+    model = Puntos_Base
+    template_name = 'pokedex/puntos_base_list.html'
+    context_object_name = 'puntos_base'
+
+class PuntosBaseDetailView(generic.DetailView):
+    model = Puntos_Base
+    template_name = 'pokedex/puntos_base_detail.html'
+    context_object_name = 'puntos_base'
+
+class PuntosBaseCreateView(generic.CreateView):
+    model = Puntos_Base
+    form_class = PuntosBaseForm
+    template_name = 'pokedex/puntos_base_form.html'
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Puntos Base para {self.object.pokemon.Nombre} han sido creados exitosamente!')
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy('pokemon_detail', kwargs={'no_pokemon': self.object.pokemon.No_Pokemon})
+        
+    def get_initial(self):
+        initial = super().get_initial()
+        if 'pokemon' in self.request.GET:
+            try:
+                pokemon = Pokemon.objects.get(No_Pokemon=self.request.GET['pokemon'])
+                initial['pokemon'] = pokemon
+            except (ValueError, Pokemon.DoesNotExist):
+                pass
+        return initial
+
+class PuntosBaseUpdateView(generic.UpdateView):
+    model = Puntos_Base
+    form_class = PuntosBaseForm
+    template_name = 'pokedex/puntos_base_form.html'
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Puntos Base para {self.object.pokemon.Nombre} han sido actualizados exitosamente!')
+        return response
+    
+    def get_success_url(self):
+        return reverse_lazy('pokemon_detail', kwargs={'no_pokemon': self.object.pokemon.No_Pokemon})
+
+class PuntosBaseDeleteView(generic.DeleteView):
+    model = Puntos_Base
+    template_name = 'pokedex/puntos_base_confirm_delete.html'
+    success_url = reverse_lazy('puntos_base_list')
 
 # Class-based views for relationship models
 # PokemonTipo views

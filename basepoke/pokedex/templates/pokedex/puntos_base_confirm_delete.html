@@ -1,0 +1,116 @@
+{% extends "pokedex/base.html" %}
+{% load static %}
+
+{% block title %}Pokédex - Eliminar Puntos Base{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen pb-20">
+    <!-- Header -->
+    <div class="bg-pokemon-red py-6 px-4 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto flex items-center">
+            <a href="{% url 'puntos_base_detail' puntos_base.id %}" class="text-white hover:text-gray-200 mr-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="flex items-center">
+                <div class="mr-4">
+                    <div class="flex space-x-2">
+                        <div class="w-3 h-3 bg-white rounded-full"></div>
+                        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-bold text-white">Eliminar Puntos Base</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-8">
+                <div class="flex items-center justify-center mb-6">
+                    <div class="bg-red-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                </div>
+                
+                <h2 class="text-xl font-semibold text-center text-gray-800 mb-4">
+                    ¿Estás seguro que deseas eliminar estos puntos base?
+                </h2>
+                
+                <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                    <div class="flex items-center">
+                        {% if puntos_base.pokemon.Ruta_Imagen %}
+                        <img src="{{ puntos_base.pokemon.Ruta_Imagen }}" alt="{{ puntos_base.pokemon.Nombre }}" class="w-12 h-12 object-contain mr-4">
+                        {% endif %}
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-700">{{ puntos_base.pokemon.Nombre }}</h3>
+                            <p class="text-xs text-gray-500">#{{ puntos_base.pokemon.No_Pokemon }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-500">HP:</span>
+                            <span class="font-medium">{{ puntos_base.HP }}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Ataque:</span>
+                            <span class="font-medium">{{ puntos_base.Ataque }}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Defensa:</span>
+                            <span class="font-medium">{{ puntos_base.Defensa }}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">At. Esp.:</span>
+                            <span class="font-medium">{{ puntos_base.Ataque_Especial }}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Def. Esp.:</span>
+                            <span class="font-medium">{{ puntos_base.Defensa_Especial }}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Velocidad:</span>
+                            <span class="font-medium">{{ puntos_base.Velocidad }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                <strong>Advertencia:</strong> Si eliminas estos puntos base, el Pokémon ya no tendrá estadísticas asociadas y no aparecerán en su ficha.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="flex justify-center space-x-4">
+                        <a href="{% url 'puntos_base_detail' puntos_base.id %}" 
+                           class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                            Cancelar
+                        </a>
+                        <button type="submit" 
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            Confirmar Eliminación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

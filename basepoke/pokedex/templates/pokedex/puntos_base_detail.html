@@ -1,0 +1,374 @@
+{% extends "pokedex/base.html" %}
+{% load static %}
+
+{% block title %}Pokédex - Puntos Base de {{ puntos_base.pokemon.Nombre }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen pb-20">
+    <!-- Header -->
+    <div class="bg-pokemon-red py-6 px-4 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <a href="{% url 'puntos_base_list' %}" class="text-white hover:text-gray-200 mr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </a>
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 bg-white rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white">Puntos Base - {{ puntos_base.pokemon.Nombre }}</h1>
+                </div>
+            </div>
+            
+            <div class="flex space-x-3">
+                <a href="{% url 'pokemon_detail' puntos_base.pokemon.No_Pokemon %}" 
+                   class="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-md transition-all duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>Ver Pokémon</span>
+                </a>
+                <a href="{% url 'puntos_base_update' puntos_base.id %}" 
+                   class="flex items-center px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded-full shadow-md transition-all duration-200 transform hover:scale-105">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    <span>Editar</span>
+                </a>
+                <a href="{% url 'puntos_base_delete' puntos_base.id %}"
+                   class="flex items-center px-4 py-2 bg-pokemon-red hover:bg-red-700 text-white rounded-full shadow-md transition-all duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>Eliminar</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Pokémon info -->
+            <div class="p-6 border-b border-gray-200 flex flex-wrap items-center gap-4">
+                <div class="flex items-center">
+                    {% if puntos_base.pokemon.Ruta_Imagen %}
+                    <img src="{{ puntos_base.pokemon.Ruta_Imagen }}" alt="{{ puntos_base.pokemon.Nombre }}" class="w-16 h-16 object-contain mr-4">
+                    {% endif %}
+                    <div>
+                        <div class="text-sm text-gray-500">#{{ puntos_base.pokemon.No_Pokemon }}</div>
+                        <h2 class="text-xl font-bold text-gray-800">{{ puntos_base.pokemon.Nombre }}</h2>
+                    </div>
+                </div>
+                
+                <!-- Naturaleza del Pokémon -->
+                {% if puntos_base.pokemon.naturaleza %}
+                <div class="ml-auto bg-gray-50 px-4 py-2 rounded-lg">
+                    <p class="text-sm text-gray-600">Naturaleza:</p>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-800">{{ puntos_base.pokemon.naturaleza.nombre }}</span>
+                        {% if puntos_base.pokemon.naturaleza.aumenta != 'Ninguna' or puntos_base.pokemon.naturaleza.disminuye != 'Ninguna' %}
+                        <div class="ml-2 flex space-x-2">
+                            {% if puntos_base.pokemon.naturaleza.aumenta != 'Ninguna' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                </svg>
+                                {{ puntos_base.pokemon.naturaleza.get_aumenta_display }}
+                            </span>
+                            {% endif %}
+                            
+                            {% if puntos_base.pokemon.naturaleza.disminuye != 'Ninguna' %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                                {{ puntos_base.pokemon.naturaleza.get_disminuye_display }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="ml-auto bg-gray-50 px-4 py-2 rounded-lg">
+                    <p class="text-sm text-gray-600">Naturaleza:</p>
+                    <div class="flex items-center">
+                        <span class="text-gray-500">Sin naturaleza asignada</span>
+                        <a href="{% url 'pokemon_update' puntos_base.pokemon.No_Pokemon %}" class="ml-2 text-blue-500 text-sm">
+                            Asignar
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Stats -->
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Puntos Base</h3>
+                
+                {% with stats_with_nature=puntos_base.get_stats_with_nature %}
+                {% with total_base=puntos_base.HP|add:puntos_base.Ataque|add:puntos_base.Defensa|add:puntos_base.Ataque_Especial|add:puntos_base.Defensa_Especial|add:puntos_base.Velocidad %}
+                {% with total_adjusted=stats_with_nature.HP|add:stats_with_nature.Ataque|add:stats_with_nature.Defensa|add:stats_with_nature.Ataque_Especial|add:stats_with_nature.Defensa_Especial|add:stats_with_nature.Velocidad %}
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Estadística
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Base
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Con Naturaleza
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Efecto
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Visualización
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- HP -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    HP
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ puntos_base.HP }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ stats_with_nature.HP }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.aumenta == 'HP' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        +10%
+                                    </span>
+                                    {% elif puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.disminuye == 'HP' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        -10%
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ puntos_base.get_stat_percentages.HP }}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Ataque -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Ataque
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ puntos_base.Ataque }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ stats_with_nature.Ataque }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.aumenta == 'Ataque' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        +10%
+                                    </span>
+                                    {% elif puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.disminuye == 'Ataque' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        -10%
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-red-600 h-2.5 rounded-full" style="width: {{ puntos_base.get_stat_percentages.Ataque }}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Defensa -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Defensa
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ puntos_base.Defensa }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ stats_with_nature.Defensa }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.aumenta == 'Defensa' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        +10%
+                                    </span>
+                                    {% elif puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.disminuye == 'Defensa' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        -10%
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-yellow-600 h-2.5 rounded-full" style="width: {{ puntos_base.get_stat_percentages.Defensa }}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Ataque Especial -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Ataque Especial
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ puntos_base.Ataque_Especial }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ stats_with_nature.Ataque_Especial }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.aumenta == 'Ataque_Especial' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        +10%
+                                    </span>
+                                    {% elif puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.disminuye == 'Ataque_Especial' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        -10%
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-purple-600 h-2.5 rounded-full" style="width: {{ puntos_base.get_stat_percentages.Ataque_Especial }}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Defensa Especial -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Defensa Especial
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ puntos_base.Defensa_Especial }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ stats_with_nature.Defensa_Especial }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.aumenta == 'Defensa_Especial' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        +10%
+                                    </span>
+                                    {% elif puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.disminuye == 'Defensa_Especial' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        -10%
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ puntos_base.get_stat_percentages.Defensa_Especial }}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Velocidad -->
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Velocidad
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ puntos_base.Velocidad }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ stats_with_nature.Velocidad }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.aumenta == 'Velocidad' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        +10%
+                                    </span>
+                                    {% elif puntos_base.pokemon.naturaleza and puntos_base.pokemon.naturaleza.disminuye == 'Velocidad' %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        -10%
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-pink-600 h-2.5 rounded-full" style="width: {{ puntos_base.get_stat_percentages.Velocidad }}%"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Total -->
+                            <tr class="bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    Total
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="
+                                        {% if total_base >= 580 %}text-green-600
+                                        {% elif total_base >= 500 %}text-blue-600
+                                        {% elif total_base >= 420 %}text-yellow-600
+                                        {% else %}text-gray-900{% endif %}">
+                                        {{ total_base }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="
+                                        {% if total_adjusted >= 580 %}text-green-600
+                                        {% elif total_adjusted >= 500 %}text-blue-600
+                                        {% elif total_adjusted >= 420 %}text-yellow-600
+                                        {% else %}text-gray-900{% endif %}">
+                                        {{ total_adjusted }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if total_adjusted != total_base %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {% if total_adjusted > total_base %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ total_adjusted|add:"-"|add:total_base }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-gray-400">—</span>
+                                    {% endif %}
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% endwith %}
+                {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "pokedex/base.html" %}
+{% load static %}
+
+{% block title %}Pokédex - {% if form.instance.id %}Editar Puntos Base{% else %}Nuevos Puntos Base{% endif %}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen pb-20">
+    <!-- Header -->
+    <div class="bg-pokemon-red py-6 px-4 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto flex items-center">
+            <a href="{% if form.instance.id %}{% url 'puntos_base_detail' form.instance.id %}{% else %}{% url 'puntos_base_list' %}{% endif %}" class="text-white hover:text-gray-200 mr-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="flex items-center">
+                <div class="mr-4">
+                    <div class="flex space-x-2">
+                        <div class="w-3 h-3 bg-white rounded-full"></div>
+                        <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-bold text-white">
+                    {% if form.instance.id %}
+                        Editar Puntos Base de {{ form.instance.pokemon.Nombre }}
+                    {% else %}
+                        Nuevos Puntos Base
+                    {% endif %}
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-8">
+                {% if form.errors %}
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">
+                                Por favor corrige los errores del formulario:
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700">
+                                <ul class="list-disc pl-5 space-y-1">
+                                    {% for field in form %}
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                            <li>{{ field.label }}: {{ error }}</li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label for="{{ form.pokemon.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                Pokémon
+                            </label>
+                            <div class="mt-1">
+                                <select name="{{ form.pokemon.name }}" id="{{ form.pokemon.id_for_label }}"
+                                        class="shadow-sm focus:ring-pokemon-red focus:border-pokemon-red block w-full sm:text-sm border-gray-300 rounded-md">
+                                    {% for choice in form.fields.pokemon.queryset %}
+                                        <option value="{{ choice.pk }}" {% if form.pokemon.value == choice.pk|stringformat:"i" %}selected{% endif %}>#{{ choice.No_Pokemon }} - {{ choice.Nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">Selecciona el Pokémon al que pertenecen estos puntos base.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="{{ form.HP.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    HP
+                                </label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <input type="number" name="{{ form.HP.name }}" id="{{ form.HP.id_for_label }}" min="1" max="255" required
+                                           class="shadow-sm focus:ring-pokemon-red focus:border-pokemon-red block w-full sm:text-sm border-gray-300 rounded-md"
+                                           value="{{ form.HP.value|default:'1' }}">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.Ataque.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Ataque
+                                </label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <input type="number" name="{{ form.Ataque.name }}" id="{{ form.Ataque.id_for_label }}" min="1" max="255" required
+                                           class="shadow-sm focus:ring-pokemon-red focus:border-pokemon-red block w-full sm:text-sm border-gray-300 rounded-md"
+                                           value="{{ form.Ataque.value|default:'1' }}">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.Defensa.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Defensa
+                                </label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <input type="number" name="{{ form.Defensa.name }}" id="{{ form.Defensa.id_for_label }}" min="1" max="255" required
+                                           class="shadow-sm focus:ring-pokemon-red focus:border-pokemon-red block w-full sm:text-sm border-gray-300 rounded-md"
+                                           value="{{ form.Defensa.value|default:'1' }}">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.Ataque_Especial.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Ataque Especial
+                                </label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <input type="number" name="{{ form.Ataque_Especial.name }}" id="{{ form.Ataque_Especial.id_for_label }}" min="1" max="255" required
+                                           class="shadow-sm focus:ring-pokemon-red focus:border-pokemon-red block w-full sm:text-sm border-gray-300 rounded-md"
+                                           value="{{ form.Ataque_Especial.value|default:'1' }}">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.Defensa_Especial.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Defensa Especial
+                                </label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <input type="number" name="{{ form.Defensa_Especial.name }}" id="{{ form.Defensa_Especial.id_for_label }}" min="1" max="255" required
+                                           class="shadow-sm focus:ring-pokemon-red focus:border-pokemon-red block w-full sm:text-sm border-gray-300 rounded-md"
+                                           value="{{ form.Defensa_Especial.value|default:'1' }}">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="{{ form.Velocidad.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Velocidad
+                                </label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <input type="number" name="{{ form.Velocidad.name }}" id="{{ form.Velocidad.id_for_label }}" min="1" max="255" required
+                                           class="shadow-sm focus:ring-pokemon-red focus:border-pokemon-red block w-full sm:text-sm border-gray-300 rounded-md"
+                                           value="{{ form.Velocidad.value|default:'1' }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-200 flex justify-end space-x-3">
+                            <a href="{% if form.instance.id %}{% url 'puntos_base_detail' form.instance.id %}{% else %}{% url 'puntos_base_list' %}{% endif %}" 
+                               class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                Cancelar
+                            </a>
+                            <button type="submit" 
+                                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pokemon-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                {% if form.instance.id %}Actualizar{% else %}Crear{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "pokedex/base.html" %}
+{% load static %}
+
+{% block title %}Pokédex - Naturalezas{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen pb-20">
+    <!-- Header -->
+    <div class="bg-pokemon-red py-6 px-4 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto flex flex-wrap justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <a href="{% url 'index' %}" class="text-white hover:text-gray-200 mr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </a>
+                <div class="flex items-center">
+                    <div class="mr-4">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 bg-white rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white">Naturalezas</h1>
+                </div>
+            </div>
+            <a href="{% url 'naturaleza_create' %}" class="bg-white hover:bg-gray-100 text-pokemon-red py-2 px-4 rounded-full shadow-md transition-colors duration-200 inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Nueva Naturaleza
+            </a>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for naturaleza in naturalezas %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+                    <h3 class="text-lg font-semibold text-gray-800">{{ naturaleza.nombre }}</h3>
+                </div>
+                <div class="px-6 py-4">
+                    {% if naturaleza.aumenta != 'Ninguna' %}
+                    <div class="mb-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                            </svg>
+                            Aumenta {{ naturaleza.get_aumenta_display }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if naturaleza.disminuye != 'Ninguna' %}
+                    <div class="mb-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            Disminuye {{ naturaleza.get_disminuye_display }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if naturaleza.aumenta == 'Ninguna' and naturaleza.disminuye == 'Ninguna' %}
+                    <div class="mb-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Naturaleza Neutral
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if naturaleza.descripcion %}
+                    <p class="text-gray-600 text-sm mt-3">{{ naturaleza.descripcion }}</p>
+                    {% endif %}
+                </div>
+                <div class="px-6 py-3 bg-gray-50 flex justify-end space-x-2 border-t border-gray-200">
+                    <a href="{% url 'naturaleza_detail' naturaleza.id %}" class="text-blue-600 hover:text-blue-800">
+                        Ver detalles
+                    </a>
+                    <span class="text-gray-300">|</span>
+                    <a href="{% url 'naturaleza_update' naturaleza.id %}" class="text-yellow-600 hover:text-yellow-800">
+                        Editar
+                    </a>
+                    <span class="text-gray-300">|</span>
+                    <a href="{% url 'naturaleza_delete' naturaleza.id %}" class="text-red-600 hover:text-red-800">
+                        Eliminar
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full bg-white p-8 rounded-lg shadow text-center">
+                <p class="text-gray-500 mb-4">No hay naturalezas registradas</p>
+                <a href="{% url 'naturaleza_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-pokemon-red hover:bg-red-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Crear Primera Naturaleza
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
